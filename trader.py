@@ -38,6 +38,12 @@ class Fundamentalist():
         
     def compute_price_boundaries(self):
 
+        """
+        Description
+        -----------
+        Computes the upper and lower bound of the fundamentalist's value  
+        """
+
         k = 2 #Preselected factor (Using value from paper)
 
         self.mt = (1/k)*self.fundamental_value 
@@ -46,6 +52,12 @@ class Fundamentalist():
         
 
     def determine_chance_function(self):
+
+        """
+        Description
+        -----------
+        Computes the upper and lower bound of the fundamentalist's value  
+        """
         
         #Parameters that describe the sensitiveness of fundamentalists
         a = 1 #Using value from paper
@@ -62,6 +74,12 @@ class Fundamentalist():
 
     def determine_demand(self):
 
+        """
+        Description
+        -----------
+        Computes the upper and lower bound of the fundamentalist's value  
+        """
+
         price_zone = (self.mt,self.MT)
 
         A = self.determine_chance_function()
@@ -75,6 +93,12 @@ class Fundamentalist():
             self.demand = 0
 
     def update_fundamental_value(self, time, s):
+
+        """
+        Description
+        -----------
+        Updates the fundamental value based on economic factors
+        """
 
         # determine the cycle of the business growth
         i = time // (4 * s) + 1
@@ -98,6 +122,8 @@ if __name__ == '__main__':
 
    print(f"PRICE ZONE -- > ({fundamentalist.mt};{fundamentalist.MT})" ) 
    print(fundamentalist.demand)
+
+
 
 
 
