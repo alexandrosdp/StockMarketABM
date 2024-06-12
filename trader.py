@@ -3,8 +3,9 @@
 
 class Fundamentalist():
 
-    def __init__(self, fundamental_value, prev_price):
+    def __init__(self, growth_rate, fundamental_value, prev_price):
 
+        self.growth_rate = growth_rate
         self.fundamental_value = fundamental_value
         self.prev_price = prev_price
 
@@ -47,7 +48,17 @@ class Fundamentalist():
 
         else:
 
-            self.demand = 0 
+            self.demand = 0
+
+    def business_growth(self, time, s):
+
+        # determine the cycle of the business growth
+        i = time // (4 * s) + 1
+
+        if time >= 4 * (i - 1) * s and time < (4 * i - 1) * s:
+            return self.growth_rate
+        else:
+            return -(self.growth_rate/2)
         
         
 
