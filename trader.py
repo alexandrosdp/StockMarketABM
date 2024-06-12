@@ -56,9 +56,11 @@ class Fundamentalist():
         i = time // (4 * s) + 1
 
         if time >= 4 * (i - 1) * s and time < (4 * i - 1) * s:
-            return self.growth_rate
+            self.fundamental_value = self.fundamental_value * (1 + self.growth_rate)
+            # return self.growth_rate
         else:
-            return -(self.growth_rate/2)
+            self.fundamental_value = self.fundamental_value * (1 - self.growth_rate/2)
+            # return -(self.growth_rate/2)
         
         
 
