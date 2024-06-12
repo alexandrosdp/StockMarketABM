@@ -1,6 +1,5 @@
 
 
-
 class Fundamentalist():
 
     """
@@ -41,7 +40,7 @@ class Fundamentalist():
 
         k = 2 #Preselected factor (Using value from paper)
 
-        self.mt = (1/k)*self.fundamental_value
+        self.mt = (1/k)*self.fundamental_value 
 
         self.MT = k*self.fundamental_value
         
@@ -50,7 +49,7 @@ class Fundamentalist():
         
         #Parameters that describe the sensitiveness of fundamentalists
         a = 1 #Using value from paper
-        d = 0.3 #Using value from paper
+        d = -0.3 #Using value from paper
 
         self.compute_price_boundaries() #Calculate values of mt and MT
 
@@ -75,7 +74,7 @@ class Fundamentalist():
 
             self.demand = 0
 
-    def business_growth(self, time, s):
+    def update_fundamental_value(self, time, s):
 
         # determine the cycle of the business growth
         i = time // (4 * s) + 1
@@ -90,10 +89,12 @@ class Fundamentalist():
 
 if __name__ == '__main__':
 
-   fundamentalist = Fundamentalist(fundamental_value=100, prev_price= 110) 
-
+   fundamentalist = Fundamentalist(growth_rate=0.008,fundamental_value=100, prev_price= 199.001) 
+    
    fundamentalist.compute_price_boundaries()
    fundamentalist.determine_demand()
+
+   fundamentalist.update_fundamental_value(time=0, s = 25)
 
    print(f"PRICE ZONE -- > ({fundamentalist.mt};{fundamentalist.MT})" ) 
    print(fundamentalist.demand)
