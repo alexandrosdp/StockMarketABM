@@ -3,7 +3,30 @@
 
 class Fundamentalist():
 
+    """
+    Description
+    -----------
+    Defines a class for a fundamentalist trader
+    """
+
     def __init__(self, fundamental_value, prev_price):
+
+        """
+        Parameters
+        -----------
+
+        fundamental_value : float
+        The fundamental value of the stock.
+        prev_price : float
+            The previous price of the stock.
+        mt : float
+            The lower bound of the fundamentalists price boundary.
+        MT : float
+            The upper bound of the fundamentalists price boundary.
+        demand : float
+            The calculated demand of the fundamentalist for a given time step.
+        
+        """
 
         self.fundamental_value = fundamental_value
         self.prev_price = prev_price
@@ -15,7 +38,7 @@ class Fundamentalist():
         
     def compute_price_boundaries(self):
 
-        k = 1.1 #Preselected factor
+        k = 2 #Preselected factor (Using value from paper)
 
         self.mt = (1/k)*self.fundamental_value
 
@@ -25,13 +48,13 @@ class Fundamentalist():
     def determine_chance_function(self):
         
         #Parameters that describe the sensitiveness of fundamentalists
-        a = 0 
-        d = 0
+        a = 1 #Using value from paper
+        d = 0.3 #Using value from paper
 
         self.compute_price_boundaries() #Calculate values of mt and MT
 
         #Compute value of chance function (given by A)
-        A = (a(self.prev_price - self.mt)**d)*((self.MT - self.prev_price)**d)
+        A = (a*(self.prev_price - self.mt)**d)*((self.MT - self.prev_price)**d)
 
         return A
 
@@ -41,13 +64,30 @@ class Fundamentalist():
 
         price_zone = (self.mt,self.MT)
 
-        if(self.prev_price in price_zone):
+        A = self.determine_chance_function()
 
-            self.demand = (self.fundamental_value - self.prev_price)()
+        if(price_zone[0] <= self.prev_price <= price_zone[1]): #Check if the global price is in the trader's price zone
+
+            self.demand = (self.fundamental_value - self.prev_price)*A
 
         else:
 
             self.demand = 0 
+
+
+if __name__ == '__main__':
+
+   fundamentalist = Fundamentalist(fundamental_value=100, prev_price= 110) 
+
+   fundamentalist.compute_price_boundaries()
+   fundamentalist.determine_demand()
+
+   print(f"PRICE ZONE -- > ({fundamentalist.mt};{fundamentalist.MT})" ) 
+   print(fundamentalist.demand)
+
+
+
+
         
         
 
