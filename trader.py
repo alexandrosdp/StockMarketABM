@@ -9,7 +9,7 @@ class Fundamentalist():
     Defines a class for a fundamentalist trader
     """
 
-    def __init__(self, fundamental_value, prev_price):
+    def __init__(self, growth_rate, fundamental_value, prev_price):
 
         """
         Parameters
@@ -28,6 +28,7 @@ class Fundamentalist():
         
         """
 
+        self.growth_rate = growth_rate
         self.fundamental_value = fundamental_value
         self.prev_price = prev_price
 
@@ -72,7 +73,19 @@ class Fundamentalist():
 
         else:
 
-            self.demand = 0 
+            self.demand = 0
+
+    def business_growth(self, time, s):
+
+        # determine the cycle of the business growth
+        i = time // (4 * s) + 1
+
+        if time >= 4 * (i - 1) * s and time < (4 * i - 1) * s:
+            self.fundamental_value = self.fundamental_value * (1 + self.growth_rate)
+            # return self.growth_rate
+        else:
+            self.fundamental_value = self.fundamental_value * (1 - self.growth_rate/2)
+            # return -(self.growth_rate/2)
 
 
 if __name__ == '__main__':
