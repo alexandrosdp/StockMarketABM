@@ -8,7 +8,7 @@ class Fundamentalist():
     Defines a class for a fundamentalist trader
     """
 
-    def __init__(self, growth_rate, fundamental_value, prev_price):
+    def __init__(self, growth_rate, fundamental_value, prev_price, risk_aversion):
 
         """
         Parameters
@@ -18,6 +18,8 @@ class Fundamentalist():
         The fundamental value of the stock.
         prev_price : float
             The previous price of the stock.
+        risk_aversion : float
+            The level of risk aversion for the fundamentalist.
         mt : float
             The lower bound of the fundamentalists price boundary.
         MT : float
@@ -30,6 +32,7 @@ class Fundamentalist():
         self.growth_rate = growth_rate
         self.fundamental_value = fundamental_value
         self.prev_price = prev_price
+        self.risk_aversion = risk_aversion
 
         #To be initialised later 
         self.mt = 0
@@ -44,7 +47,9 @@ class Fundamentalist():
         Computes the upper and lower bound of the fundamentalist's value  
         """
 
-        k = 2 #Preselected factor (Using value from paper)
+        
+
+        k = self.risk_aversion #Preselected factor (Using value from paper)
 
         self.mt = (1/k)*self.fundamental_value 
 
@@ -113,7 +118,7 @@ class Fundamentalist():
 
 if __name__ == '__main__':
 
-   fundamentalist = Fundamentalist(growth_rate=0.008,fundamental_value=100, prev_price= 199.001) 
+   fundamentalist = Fundamentalist(growth_rate=0.008,fundamental_value=100, prev_price= 199.001, risk_aversion=2) 
     
    fundamentalist.compute_price_boundaries()
    fundamentalist.determine_demand()
@@ -122,6 +127,7 @@ if __name__ == '__main__':
 
    print(f"PRICE ZONE -- > ({fundamentalist.mt};{fundamentalist.MT})" ) 
    print(fundamentalist.demand)
+
 
 
 
