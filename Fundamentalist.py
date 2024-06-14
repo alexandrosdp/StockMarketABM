@@ -8,7 +8,7 @@ class Fundamentalist():
     Defines a class for a fundamentalist trader
     """
 
-    def __init__(self, growth_rate, fundamental_value, prev_price, risk_aversion):
+    def __init__(self, growth_rate, fundamental_value, prev_price, risk_aversion, information_cost):
 
         """
         Parameters
@@ -33,6 +33,7 @@ class Fundamentalist():
         self.fundamental_value = fundamental_value
         self.prev_price = prev_price
         self.risk_aversion = risk_aversion
+        self.information_cost = information_cost
 
         #To be initialised later 
         self.mt = 0
@@ -114,6 +115,14 @@ class Fundamentalist():
         else:
             self.fundamental_value = self.fundamental_value * (1 - self.growth_rate/2)
             # return -(self.growth_rate/2)
+
+    def calculate_expected_profit(self,current_price,interest_rate):
+        """
+        Computes the expected profit for fundamentalists
+        """
+        s_pt = abs((self.fundamental_value - current_price) / (3 * self.fundamental_value))
+        self.expected_profit = s_pt * abs(self.fundamental_value - (1 + interest_rate) * self.prev_price) - self.information_cost
+        return self.expected_profit
 
 
 if __name__ == '__main__':

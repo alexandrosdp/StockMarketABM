@@ -44,6 +44,15 @@ class Chartist:
         :return: Demand value
         """
         return self.g * self.b * (pt_minus_1 - vt_minus_1)
+    
+    def compute_expected_profit(self, interest_rate, pt_minus_1, vt_minus_1):
+        """
+        Computes the expected profit for chartists
+        """
+
+        self.expected_profit = abs(self.b * (pt_minus_1 - vt_minus_1) - interest_rate * pt_minus_1)
+       
+        return self.expected_profit
 
 
 
