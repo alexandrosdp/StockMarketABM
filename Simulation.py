@@ -17,14 +17,18 @@ class Market:
         self.adjustment_speed = adjustment_speed
         self.prices = prices # Initial price
         self.market_fractions = None
+        self.market_fractions_array = []
 
     def update_market_fractions(self):
         for chartist in self.chartists:
             chartist.update_fundamental_value(self.prices[-1])
+        print(self.fundamentalist.fundamental_value, self.prices[-1])
         profits = [chartist.compute_expected_profit(self.interest_rate, self.prices[-1]) for chartist in self.chartists] + [self.fundamentalist.calculate_expected_profit(self.prices[-1], self.interest_rate)]
+        # print(profits, self.fundamentalist.fundamental_value)
         exp_profits = [math.exp(self.q * profit) for profit in profits]
         sum_exp_profits = sum(exp_profits)
         self.market_fractions = [exp_profit / sum_exp_profits for exp_profit in exp_profits]
+        self.market_fractions_array.append(self.market_fractions)
 
     def compute_excess_demand(self):
         """
@@ -34,6 +38,12 @@ class Market:
 
         demands = [chartist.calculate_demand(self.prices[-1]) for chartist in self.chartists] + [self.fundamentalist.calculate_demand(self.prices[-1])]
         self.excess_demand = sum(demand * fraction for demand, fraction in zip(demands, self.market_fractions))
+
+    # def calculate_volume(self):
+    #     """
+    #     Calculates the volume of the market
+    #     """
+    #     return sum(demand * fraction for demand, fraction in zip(self.market_fractions, [chartist.demand for chartist in self.chartists] + [self.fundamentalist.demand]))
 
     def update_price(self):
         """
@@ -59,11 +69,14 @@ def run_simulation(initial_price, time_steps):
 
         market.update_price()
 
-    return market.prices
+    return market.prices, market.market_fractions_array
 
 if __name__ == '__main__':
     initial_price = 50
-    prices = run_simulation(initial_price, 1000)
+    prices, market_fractions_array = run_simulation(initial_price, 1000)
     plt.plot(prices)
+    # for i in range(3):
+    #     plt.plot([market_fractions[i] for market_fractions in market_fractions_array], label=f"Market fraction {i}")
+    plt.legend()
     plt.show()
 
