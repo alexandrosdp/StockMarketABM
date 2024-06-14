@@ -8,7 +8,7 @@ class Fundamentalist():
     Defines a class for a fundamentalist trader
     """
 
-    def __init__(self, growth_rate, fundamental_value, prev_price, risk_aversion, information_cost):
+    def __init__(self, growth_rate, fundamental_value, risk_aversion, information_cost):
 
         """
         Parameters
@@ -31,7 +31,6 @@ class Fundamentalist():
 
         self.growth_rate = growth_rate
         self.fundamental_value = fundamental_value
-        self.prev_price = prev_price
         self.risk_aversion = risk_aversion
         self.information_cost = information_cost
 
@@ -57,7 +56,7 @@ class Fundamentalist():
         self.MT = k*self.fundamental_value
         
 
-    def determine_chance_function(self):
+    def determine_chance_function(self, prev_price):
 
         """
         Description
@@ -72,13 +71,13 @@ class Fundamentalist():
         self.compute_price_boundaries() #Calculate values of mt and MT
 
         #Compute value of chance function (given by A)
-        A = (a*(self.prev_price - self.mt)**d)*((self.MT - self.prev_price)**d)
+        A = (a*(prev_price - self.mt)**d)*((self.MT - prev_price)**d)
 
         return A
 
 
 
-    def calculate_demand(self):
+    def calculate_demand(self, prev_price):
 
         """
         Description
@@ -86,23 +85,27 @@ class Fundamentalist():
         Computes the upper and lower bound of the fundamentalist's value  
         """
 
+
+        A = self.determine_chance_function(prev_price)
+
         price_zone = (self.mt,self.MT)
 
-        A = self.determine_chance_function()
+        if(price_zone[0] <= prev_price <= price_zone[1]): #Check if the global price is in the trader's price zone
 
-        if(price_zone[0] <= self.prev_price <= price_zone[1]): #Check if the global price is in the trader's price zone
-
-            self.demand = (self.fundamental_value - self.prev_price)*A
+            self.demand = (self.fundamental_value - prev_price)*A
 
         else:
 
             self.demand = 0
+
+        return self.demand
 
     def update_fundamental_value(self, time, s):
 
         """
         Description
         -----------
+        s : period of the business cycle
         Updates the fundamental value based on economic factors
         """
 
@@ -116,12 +119,12 @@ class Fundamentalist():
             self.fundamental_value = self.fundamental_value * (1 - self.growth_rate/2)
             # return -(self.growth_rate/2)
 
-    def calculate_expected_profit(self,current_price,interest_rate):
+    def calculate_expected_profit(self, prev_price, interest_rate):
         """
         Computes the expected profit for fundamentalists
         """
-        s_pt = abs((self.fundamental_value - current_price) / (3 * self.fundamental_value))
-        self.expected_profit = s_pt * abs(self.fundamental_value - (1 + interest_rate) * self.prev_price) - self.information_cost
+        s_pt = abs((self.fundamental_value - prev_price) / (3 * self.fundamental_value))
+        self.expected_profit = s_pt * abs(self.fundamental_value - (1 + interest_rate) * prev_price) - self.information_cost
         return self.expected_profit
 
 

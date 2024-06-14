@@ -3,7 +3,7 @@ import math
 
 class Chartist:
     
-    def __init__(self, b, g, current_price):
+    def __init__(self, b, g, lambda1):
         """
         Initializes a new instance of the Chartist class.
         
@@ -13,48 +13,50 @@ class Chartist:
         """
         self.b = b
         self.g = g
-        self.current_price = current_price
+        self.lambda1 = lambda1
         self.demamd = None 
         self.vt = None  # Short-term fundamental value, initially unknown
         
         
     
-    def update_fundamental_value(self, lambda1 ):
+    def update_fundamental_value(self, prev_price):
         """
         Updates the short-term fundamental value based on the last price and price regimes.
         
-        :param pt_minus_1: Last known price
+        :param prev_price: Last known price
         """
-        self.vt = (math.floor(self.current_price/lambda1 ) + math.ceil(self.current_price/lambda1 )) * lambda1 / 2
+        self.vt = (math.floor(prev_price/self.lambda1 ) + math.ceil(prev_price/self.lambda1 )) * self.lambda1 / 2
     
         
     
-    def expected_price(self, pt_minus_1):
+    def expected_price(self, prev_price):
         """
         Calculate the expected price based on the last price and the current fundamental value.
         
-        :param pt_minus_1: Last known price
+        :param prev_price: Last known price
         :return: Expected price for the next period
         """
         if self.vt is None:
-            self.update_fundamental_value(pt_minus_1)
-        return pt_minus_1 + self.b * (pt_minus_1 - self.vt)
+            self.update_fundamental_value(prev_price)
+        return prev_price + self.b * (prev_price - self.vt)
     
-    def calculate_demand(self, pt_minus_1, vt_minus_1):
+    def calculate_demand(self, prev_price):
         """
         Calculates the chartist's demand based on price expectations and current price.
         
-        :param pt_minus_1: Last known price
+        :param prev_price: Last known price
         :return: Demand value
         """
-        self.demand =  self.g * self.b * (pt_minus_1 - vt_minus_1)
+        self.demand =  self.g * self.b * (prev_price - self.vt)
+
+        return self.demand
     
-    def compute_expected_profit(self, interest_rate, pt_minus_1, vt_minus_1):
+    def compute_expected_profit(self, interest_rate, prev_price):
         """
         Computes the expected profit for chartists
         """
 
-        self.expected_profit = abs(self.b * (pt_minus_1 - vt_minus_1) - interest_rate * pt_minus_1)
+        self.expected_profit = abs(self.b * (prev_price - self.vt) - interest_rate * prev_price)
        
         return self.expected_profit
 
