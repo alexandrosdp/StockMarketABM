@@ -10,34 +10,9 @@ import numpy as np
 # In[ ]:
 
 
-class Fundamentalist:
-    # ... (existing methods)
-
-    def calculate_expected_profit(self, prev_price, current_price, r, C):
-        """
-        Computes the expected profit for fundamentalists
-        """
-        s_pt = abs((self.fundamental_value - self.prev_price) / (3 * self.fundamental_value))
-        self.expected_profit = s_pt * abs(self.fundamental_value - (1 + interest_rate) * self.prev_price) - self.information_cost
-        return self.expected_profit
-
-    
-class Chartist:
-    # ... (existing methods)
-    
-    def compute_expected_profit(self, interest_rate, vt_minus_1):
-        """
-        Computes the expected profit for chartists
-        """
-        if self.b > 0:  # Trend followers
-            self.expected_profit = abs(self.b * (self.prev_price - vt_minus_1) - interest_rate * self.prev_price)
-        else:  # Contrarians
-            self.expected_profit = abs(self.b * (self.prev_price - vt_minus_1) - interest_rate * self.prev_price)
-        return self.expected_profit
 
 
-# In[ ]:
-
+#
 
 class Market:
     def __init__(self, fundamentalist, chartists, interest_rate, q, adjustment_speed):
