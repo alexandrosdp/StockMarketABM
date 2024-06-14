@@ -78,7 +78,7 @@ class Fundamentalist():
 
 
 
-    def determine_demand(self):
+    def calculate_demand(self):
 
         """
         Description
@@ -127,10 +127,10 @@ class Fundamentalist():
 
 if __name__ == '__main__':
 
-   fundamentalist = Fundamentalist(growth_rate=0.008,fundamental_value=100, prev_price= 199.001, risk_aversion=2) 
+   fundamentalist = Fundamentalist(growth_rate=0.008,fundamental_value=100, prev_price= 199.001, risk_aversion=2, information_cost=3) 
     
    fundamentalist.compute_price_boundaries()
-   fundamentalist.determine_demand()
+   fundamentalist.calculate_demand()
 
    fundamentalist.update_fundamental_value(time=0, s = 25)
 

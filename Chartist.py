@@ -14,6 +14,7 @@ class Chartist:
         self.b = b
         self.g = g
         self.current_price = current_price
+        self.demamd = None 
         self.vt = None  # Short-term fundamental value, initially unknown
         
         
@@ -46,7 +47,7 @@ class Chartist:
         :param pt_minus_1: Last known price
         :return: Demand value
         """
-        return self.g * self.b * (pt_minus_1 - vt_minus_1)
+        self.demand =  self.g * self.b * (pt_minus_1 - vt_minus_1)
     
     def compute_expected_profit(self, interest_rate, pt_minus_1, vt_minus_1):
         """
