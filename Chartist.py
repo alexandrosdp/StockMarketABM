@@ -1,7 +1,9 @@
 
+import math
+
 class Chartist:
     
-    def __init__(self, b, g, price_regimes):
+    def __init__(self, b, g, current_price):
         """
         Initializes a new instance of the Chartist class.
         
@@ -11,19 +13,20 @@ class Chartist:
         """
         self.b = b
         self.g = g
-        self.price_regimes = price_regimes
+        self.current_price = current_price
         self.vt = None  # Short-term fundamental value, initially unknown
+        
+        
     
-    def update_fundamental_value(self, pt_minus_1):
+    def update_fundamental_value(self, lambda1 ):
         """
         Updates the short-term fundamental value based on the last price and price regimes.
         
         :param pt_minus_1: Last known price
         """
-        for p_min, p_max in self.price_regimes:
-            if p_min <= pt_minus_1 <= p_max:
-                self.vt = (p_min + p_max) / 2
-                break
+        self.vt = (math.floor(self.current_price/lambda1 ) + math.ceil(self.current_price/lambda1 )) * lambda1 / 2
+    
+        
     
     def expected_price(self, pt_minus_1):
         """
