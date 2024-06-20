@@ -4,7 +4,7 @@ import math
 
 class Fundamentalist:
     def __init__(self, node_number,eta, alpha_w, alpha_O, alpha_p, phi, sigma_f, pstar):
-        self.type = 'undamentalist'
+        self.type = 'Fundamentalist'
         self.node_number = node_number
         self.eta = eta
         self.alpha_w = alpha_w
@@ -16,6 +16,7 @@ class Fundamentalist:
         self.Wf = [0,0]
         self.Gf = [0,0]
         self.Df = [0,0]
+        self.profit_list = []
 
     def update_performance(self, prices, t):
         self.Gf.append((np.exp(prices[t]) - np.exp(prices[t-1])) * self.Df[t-2])

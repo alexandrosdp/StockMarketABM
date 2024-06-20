@@ -12,6 +12,7 @@ class Chartist:
         self.Wc = [0,0]
         self.Gc = [0,0]
         self.Dc = [0,0]
+        self.profit_list = []
 
     def update_performance(self, prices, t):
         self.Gc.append((np.exp(prices[t]) - np.exp(prices[t-1])) * self.Dc[t-2])
@@ -22,3 +23,9 @@ class Chartist:
     def calculate_demand(self, P, t):
         self.Dc.append(self.chi * (P[t] - P[t-1]) + self.sigma_c * np.random.randn(1).item())
         return self.Dc[t]
+    def change_strategy(self, new_strategy, t):
+        if new_strategy == 'fundamentalist':
+            self.type = 'fundamentalist'
+
+
+ 

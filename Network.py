@@ -64,6 +64,10 @@ class Network():
         
         plt.show()
 
+    def get_neighbors(self, node_number):
+        """Returns the neighbors of a node."""
+        return list(self.network.neighbors(node_number))
+
     def create_traders(self):
 
         """Create a trader dictionary with a certain fraction of each type of trader"""
@@ -83,12 +87,14 @@ class Network():
                 alpha_O = 2.1
                 alpha_p = 0
                 phi = np.abs(np.random.normal(1,0.1))
+                # phi = 1.00
                 sigma_f =  0.681
                 pstar = 0 
                 traders.append(Fundamentalist(i,eta,alpha_w,alpha_O,alpha_p,phi,sigma_f,pstar))
             if trader_type == 'chartist':
                 eta = 0.991
                 chi = np.abs(np.random.normal(1.20,0.1))
+                # chi = 1.20
                 sigma_c = 1.724
                 traders.append(Chartist(i, eta, chi,sigma_c))
             # if trader_type == 'random trader':

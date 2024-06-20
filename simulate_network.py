@@ -21,6 +21,18 @@ class Market:
     def calculate_A(self, t):
         self.A.append(self.alpha_w * (self.fundamentalist.Wf[t] - self.chartist.Wc[t]) + self.alpha_O + self.alpha_p * (self.fundamentalist.pstar - self.prices[t])**2)
 
+    def update_strategies(self, t):
+        # loop over all agents and update their strategies
+        for agent in self.network.trader_dictionary.values():
+            agent_node_number = agent.node_number
+            agent_profit_list = agent.profits
+            neighbors = self.network.get_neighbors(agent.node_number)
+            profits = [neighbor.profit for neighbor in neighbors]
+            if agent.profit < np.max(profits):
+                self.network.trader_dictionary[agent_node_number] = neighbors[np.argmax(profits)]
+                self.network.trader_dictionary[agent_node_number].profit_list = agent_profit_list
+                self.network.trader_dictionary[agent_node_number].node_number = agent_node_number
+
     def calculate_demands(self, t):
         # loop over all agents and update their demands
         keys = self.network.trader_dictionary.keys()
@@ -35,13 +47,15 @@ class Market:
         self.prices.append(new_price)
 
 def run_simulation(initial_price, time_steps):
-    network = Network(network_type='barabasi', number_of_traders = 20, percent_fund=0.5, percent_chartist=0.5,new_node_edges=3)
+    network = Network(network_type='barabasi', number_of_traders = 100, percent_fund=0.5, percent_chartist=0.5,new_node_edges=3)
     network.create_network()
     prices = [initial_price, initial_price, initial_price]  # Ensure enough initial prices for the first calculations
     market = Market(network, mu=0.01, prices=prices, beta=1, alpha_w=2668, alpha_O=2.1, alpha_p=0)
 
     for t in range(2, time_steps):
         
+        # update strategies for all agents
+        # market.network.update_strategies(t)
         # Calculate the demands of all agents
         market.calculate_demands(t)
 
