@@ -1,82 +1,90 @@
-
 import math
+import numpy as np
 from Fundamentalist import Fundamentalist
 from Chartist import Chartist
 import matplotlib.pyplot as plt
 
 
 class Market:
-
-
-    def __init__(self, fundamentalist, chartists, interest_rate, q, adjustment_speed, prices):
-
+    def __init__(self, fundamentalist, chartist, mu, prices, beta, alpha_w, alpha_O, alpha_p):
         self.fundamentalist = fundamentalist
-        self.chartists = chartists
-        self.interest_rate = interest_rate
-        self.q = q # Intensity of choice
-        self.adjustment_speed = adjustment_speed
-        self.prices = prices # Initial price
-        self.market_fractions = None
-        self.market_fractions_array = []
+        self.chartist = chartist
+        self.mu = mu
+        self.prices = prices  # Initial price
+        self.beta = beta
+        self.alpha_w = alpha_w
+        self.alpha_O = alpha_O
+        self.alpha_p = alpha_p
+        self.A = [0,0]
+        self.Nf = [0.5,0.5]
+        self.Nc = [0.5,0.5]
 
-    def update_market_fractions(self):
-        for chartist in self.chartists:
-            chartist.update_fundamental_value(self.prices[-1])
-        print(self.fundamentalist.fundamental_value, self.prices[-1])
-        profits = [chartist.compute_expected_profit(self.interest_rate, self.prices[-1]) for chartist in self.chartists] + [self.fundamentalist.calculate_expected_profit(self.prices[-1], self.interest_rate)]
-        # print(profits, self.fundamentalist.fundamental_value)
-        exp_profits = [math.exp(self.q * profit) for profit in profits]
-        sum_exp_profits = sum(exp_profits)
-        self.market_fractions = [exp_profit / sum_exp_profits for exp_profit in exp_profits]
-        self.market_fractions_array.append(self.market_fractions)
+    def update_market_fractions(self, t):
+        self.Nf.append(1 / (1 + np.exp(-self.beta * self.A[t-1])))
+        self.Nc.append(1 - self.Nf[t])
 
-    def compute_excess_demand(self):
-        """
-        Computes the excess demand in the market
+    def calculate_A(self, t):
+        self.A.append(self.alpha_w * (self.fundamentalist.Wf[t] - self.chartist.Wc[t]) + self.alpha_O + self.alpha_p * (self.fundamentalist.pstar - self.prices[t])**2)
 
-        """
+    def calculate_demands(self, t):
+        self.fundamentalist.calculate_demand(self.prices, t)
+        self.chartist.calculate_demand(self.prices, t)
 
-        demands = [chartist.calculate_demand(self.prices[-1]) for chartist in self.chartists] + [self.fundamentalist.calculate_demand(self.prices[-1])]
-        self.excess_demand = sum(demand * fraction for demand, fraction in zip(demands, self.market_fractions))
-
-    # def calculate_volume(self):
-    #     """
-    #     Calculates the volume of the market
-    #     """
-    #     return sum(demand * fraction for demand, fraction in zip(self.market_fractions, [chartist.demand for chartist in self.chartists] + [self.fundamentalist.demand]))
-
-    def update_price(self):
-        """
-        Updates the market price based on excess demand
-        """
-        new_price = self.prices[-1] + self.adjustment_speed * self.excess_demand
+    def update_price(self, t):
+        new_price = self.prices[t] + self.mu * ( self.Nf[t] * self.fundamentalist.Df[t] + self.Nc[t] * self.chartist.Dc[t])
         self.prices.append(new_price)
 
 def run_simulation(initial_price, time_steps):
+    fundamentalist = Fundamentalist(eta=0.991, alpha_w=2668, alpha_O=2.1, alpha_p=0, phi=1.00, sigma_f=0.681, pstar=0)
+    chartist = Chartist(eta=0.991, chi=1.20, sigma_c=1.724)
+    prices = [initial_price, initial_price, initial_price]  # Ensure enough initial prices for the first calculations
+    market = Market(fundamentalist, chartist, mu=0.01, prices=prices, beta=1, alpha_w=2668, alpha_O=2.1, alpha_p=0)
 
-    fundamentalist = Fundamentalist(growth_rate=0.008, fundamental_value=50, risk_aversion=2, information_cost = 3)
-    chartists = [Chartist(b=1.2, g=0.833, lambda1 = 13.1787),  # Trend follower
-                Chartist(b=-0.7, g=3.214, lambda1 = 13.1787)]  # Contrarian
-    prices = [initial_price]
-    market = Market(fundamentalist, chartists, interest_rate=0.0001, q=0.9, adjustment_speed=1, prices=prices)
-    
-    # Simulate market updates
-    for t in range(time_steps):  # Simulate for 10 periods
+    for t in range(2, time_steps):
+        # Update portfolio performance
+        market.fundamentalist.update_performance(market.prices, t)
+        market.chartist.update_performance(market.prices, t)  
 
-        fundamentalist.update_fundamental_value(time=t, s=25)
-        market.update_market_fractions()
-        market.compute_excess_demand()
+        #summarize performance over time
+        market.fundamentalist.update_wealth(t)
+        market.chartist.update_wealth(t)
 
-        market.update_price()
+        # type fractions
+        market.update_market_fractions(t)
 
-    return market.prices, market.market_fractions_array
+        # The A[t] dynamic is set up to handle several models
+        market.calculate_A(t)
+
+        # Calculate demands
+        market.fundamentalist.calculate_demand(market.prices,t)
+        market.chartist.calculate_demand(market.prices,t)
+ 
+        # Update price
+        market.update_price(t)
+
+    return market.prices
 
 if __name__ == '__main__':
-    initial_price = 50
-    prices, market_fractions_array = run_simulation(initial_price, 1000)
+    initial_price = 0
+    T = 7000
+    pstar = 0
+
+    prices = run_simulation(initial_price, T)
+
+    rr = np.array(prices[1:T+1]) - np.array(prices[0:T])
+
+    plt.figure()
     plt.plot(prices)
-    # for i in range(3):
-    #     plt.plot([market_fractions[i] for market_fractions in market_fractions_array], label=f"Market fraction {i}")
-    plt.legend()
+    plt.xlabel('Time')
+    plt.ylabel('Price')
+    plt.title('Discrete Choice Approach: Wealth')
+    plt.show()
+
+    # plot returns
+    fig_r, ax_r = plt.subplots()
+    ax_r.plot(range(T), rr)
+    plt.xlabel('Time')
+    plt.ylabel('Returns')
+    ax_r.set_title('Discrete Choice Approach:Wealth')
     plt.show()
 

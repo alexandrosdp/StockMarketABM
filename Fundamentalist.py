@@ -1,155 +1,25 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import math
 
+class Fundamentalist:
+    def __init__(self, eta, alpha_w, alpha_O, alpha_p, phi, sigma_f, pstar):
+        self.eta = eta
+        self.alpha_w = alpha_w
+        self.alpha_O = alpha_O
+        self.alpha_p = alpha_p
+        self.phi = phi
+        self.sigma_f = sigma_f
+        self.pstar = pstar
+        self.Wf = [0,0]
+        self.Gf = [0,0]
+        self.Df = [0,0]
 
-class Fundamentalist():
+    def update_performance(self, prices, t):
+        self.Gf.append((np.exp(prices[t]) - np.exp(prices[t-1])) * self.Df[t-2])
 
-    """
-    Description
-    -----------
-    Defines a class for a fundamentalist trader
-    """
+    def update_wealth(self, t):
+        self.Wf.append(self.eta * self.Wf[t-1] + (1 - self.eta) * self.Gf[t])
 
-    def __init__(self, growth_rate, fundamental_value, risk_aversion, information_cost):
-
-        """
-        Parameters
-        -----------
-
-        fundamental_value : float
-        The fundamental value of the stock.
-        prev_price : float
-            The previous price of the stock.
-        risk_aversion : float
-            The level of risk aversion for the fundamentalist.
-        mt : float
-            The lower bound of the fundamentalists price boundary.
-        MT : float
-            The upper bound of the fundamentalists price boundary.
-        demand : float
-            The calculated demand of the fundamentalist for a given time step.
-        
-        """
-
-        self.growth_rate = growth_rate
-        self.fundamental_value = fundamental_value
-        self.risk_aversion = risk_aversion
-        self.information_cost = information_cost
-
-        #To be initialised later 
-        self.mt = 0
-        self.MT = 0
-        self.demand = 0
-        
-    def compute_price_boundaries(self):
-
-        """
-        Description
-        -----------
-        Computes the upper and lower bound of the fundamentalist's value  
-        """
-
-        
-
-        k = self.risk_aversion #Preselected factor (Using value from paper)
-
-        self.mt = (1/k)*self.fundamental_value 
-
-        self.MT = k*self.fundamental_value
-        
-
-    def determine_chance_function(self, prev_price):
-
-        """
-        Description
-        -----------
-        Computes the upper and lower bound of the fundamentalist's value  
-        """
-        
-        #Parameters that describe the sensitiveness of fundamentalists
-        a = 1 #Using value from paper
-        d = -0.3 #Using value from paper
-
-        self.compute_price_boundaries() #Calculate values of mt and MT
-
-        #Compute value of chance function (given by A)
-        A = (a*(prev_price - self.mt)**d)*((self.MT - prev_price)**d)
-
-        return A
-
-
-
-    def calculate_demand(self, prev_price):
-
-        """
-        Description
-        -----------
-        Computes the upper and lower bound of the fundamentalist's value  
-        """
-
-
-        A = self.determine_chance_function(prev_price)
-
-        price_zone = (self.mt,self.MT)
-
-        if(price_zone[0] <= prev_price <= price_zone[1]): #Check if the global price is in the trader's price zone
-
-            self.demand = (self.fundamental_value - prev_price)*A
-
-        else:
-
-            self.demand = 0
-
-        return self.demand
-
-    def update_fundamental_value(self, time, s):
-
-        """
-        Description
-        -----------
-        s : period of the business cycle
-        Updates the fundamental value based on economic factors
-        """
-
-        # determine the cycle of the business growth
-        i = time // (4 * s) + 1
-
-        if time >= 4 * (i - 1) * s and time < (4 * i - 1) * s:
-            self.fundamental_value = self.fundamental_value * (1 + self.growth_rate)
-            # return self.growth_rate
-        else:
-            self.fundamental_value = self.fundamental_value * (1 - self.growth_rate/2)
-            # return -(self.growth_rate/2)
-
-    def calculate_expected_profit(self, prev_price, interest_rate):
-        """
-        Computes the expected profit for fundamentalists
-        """
-        s_pt = abs((self.fundamental_value - prev_price) / (3 * self.fundamental_value))
-        self.expected_profit = s_pt * abs(self.fundamental_value - (1 + interest_rate) * prev_price) - self.information_cost
-        return self.expected_profit
-
-
-if __name__ == '__main__':
-
-   fundamentalist = Fundamentalist(growth_rate=0.008,fundamental_value=100, prev_price= 199.001, risk_aversion=2, information_cost=3) 
-    
-   fundamentalist.compute_price_boundaries()
-   fundamentalist.calculate_demand()
-
-   fundamentalist.update_fundamental_value(time=0, s = 25)
-
-   print(f"PRICE ZONE -- > ({fundamentalist.mt};{fundamentalist.MT})" ) 
-   print(fundamentalist.demand)
-
-
-
-
-
-
-
-        
-        
-
-        
-
-
-
+    def calculate_demand(self, P, t):
+        self.Df.append(self.phi * (self.pstar - P[t]) + self.sigma_f * np.random.randn(1).item())
