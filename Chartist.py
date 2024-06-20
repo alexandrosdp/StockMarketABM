@@ -21,3 +21,4 @@ class Chartist:
 
     def calculate_demand(self, P, t):
         self.Dc.append(self.chi * (P[t] - P[t-1]) + self.sigma_c * np.random.randn(1).item())
+        return self.Dc[t]

@@ -27,7 +27,7 @@ class Network():
 
     def create_network(self):
 
-        if self.network_type == "barabsi":
+        if self.network_type == "barabasi":
                 
             self.network = nx.barabasi_albert_graph(n = self.number_of_traders,  m=self.new_node_edges)
 

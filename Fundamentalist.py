@@ -25,3 +25,4 @@ class Fundamentalist:
 
     def calculate_demand(self, P, t):
         self.Df.append(self.phi * (self.pstar - P[t]) + self.sigma_f * np.random.randn(1).item())
+        return self.Df[t]
