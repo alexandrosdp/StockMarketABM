@@ -3,7 +3,9 @@ import matplotlib.pyplot as plt
 import math
 
 class Chartist:
-    def __init__(self, eta, chi, sigma_c):
+    def __init__(self,node_number,eta, chi, sigma_c):
+        self.type = 'Chartist'
+        self.node_number = node_number
         self.eta = eta
         self.chi = chi
         self.sigma_c = sigma_c

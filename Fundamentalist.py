@@ -3,7 +3,9 @@ import matplotlib.pyplot as plt
 import math
 
 class Fundamentalist:
-    def __init__(self, eta, alpha_w, alpha_O, alpha_p, phi, sigma_f, pstar):
+    def __init__(self, node_number,eta, alpha_w, alpha_O, alpha_p, phi, sigma_f, pstar):
+        self.type = 'undamentalist'
+        self.node_number = node_number
         self.eta = eta
         self.alpha_w = alpha_w
         self.alpha_O = alpha_O

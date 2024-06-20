@@ -35,8 +35,8 @@ class Market:
         self.prices.append(new_price)
 
 def run_simulation(initial_price, time_steps):
-    fundamentalist = Fundamentalist(eta=0.991, alpha_w=2668, alpha_O=2.1, alpha_p=0, phi=1.00, sigma_f=0.681, pstar=0)
-    chartist = Chartist(eta=0.991, chi=1.20, sigma_c=1.724)
+    fundamentalist = Fundamentalist(node_number=1,eta=0.991, alpha_w=2668, alpha_O=2.1, alpha_p=0, phi=1.00, sigma_f=0.681, pstar=0)
+    chartist = Chartist(node_number=2, eta=0.991, chi=1.20, sigma_c=1.724)
     prices = [initial_price, initial_price, initial_price]  # Ensure enough initial prices for the first calculations
     market = Market(fundamentalist, chartist, mu=0.01, prices=prices, beta=1, alpha_w=2668, alpha_O=2.1, alpha_p=0)
 
