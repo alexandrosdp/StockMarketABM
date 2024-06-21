@@ -8,6 +8,9 @@ import statsmodels.api as sm
 from scipy.stats import kurtosis
 from scipy.stats import norm
 from statsmodels.graphics.tsaplots import plot_acf
+from utils import progress_bar, clear_progress_bar
+
+
 
 
 class Market:
@@ -87,6 +90,10 @@ def run_simulation(initial_price, time_steps):
 
         # Update price
         market.update_price(t)
+
+        progress_bar(t / time_steps) 
+
+    clear_progress_bar()
 
     return market
 
