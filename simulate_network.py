@@ -32,16 +32,28 @@ class Market:
             agent_W = agent.W
             agent_G = agent.G
             agent_D = agent.D
+            agent_lookback_period = agent.lookback_period
+            agent_max_risk = agent.max_risk
 
             neighbor_node_numbers = self.network.get_neighbors(agent.node_number)
             neighbors = [self.network.trader_dictionary[neighbor] for neighbor in neighbor_node_numbers]
-            perfomances = [neighbor.G[t] for neighbor in neighbors]
-            if agent_G[t] < np.max(perfomances):
+            
+            perfomances = [self.calculate_average_performance(neighbor, agent_lookback_period) for neighbor in neighbors]
+            if self.calculate_average_performance(agent, agent_lookback_period) < np.max(perfomances):
                 self.network.trader_dictionary[agent_node_number] = neighbors[np.argmax(perfomances)]  
                 self.network.trader_dictionary[agent_node_number].node_number = agent_node_number
                 self.network.trader_dictionary[agent_node_number].W = agent_W 
                 self.network.trader_dictionary[agent_node_number].G = agent_G
                 self.network.trader_dictionary[agent_node_number].D = agent_D
+                self.network.trader_dictionary[agent_node_number].lookback_period = agent_lookback_period
+                self.network.trader_dictionary[agent_node_number].max_risk = agent_max_risk
+
+
+    def calculate_average_performance(self, agent, agent_lookback_period):
+        if len(self.prices) < agent_lookback_period:
+            return np.mean(agent.G)
+        else:
+            return np.mean(agent.G[-agent_lookback_period:])
 
     def calculate_demands(self, t):
         # loop over all agents and update their demands

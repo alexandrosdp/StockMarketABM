@@ -3,12 +3,14 @@ import matplotlib.pyplot as plt
 import math
 
 class Chartist:
-    def __init__(self, node_number,eta, chi, sigma_c):
+    def __init__(self, node_number,eta, chi, sigma_c, lookback_period, max_risk):
         self.type = 'Chartist'
         self.node_number = node_number
         self.eta = eta
         self.chi = chi
         self.sigma_c = sigma_c
+        self.lookback_period = lookback_period
+        self.max_risk = max_risk
         self.W = [0,0]
         self.G = [0,0]
         self.D = [0,0]
@@ -20,7 +22,11 @@ class Chartist:
         self.W.append(self.eta * self.W[t-1] + (1 - self.eta) * self.G[t])
 
     def calculate_demand(self, P, t):
-        self.D.append(self.chi * (P[t] - P[t-1]) + self.sigma_c * np.random.randn(1).item())
+        vol = np.std(np.diff(P)) * np.sqrt(252)
+        if vol <= self.max_risk:
+            self.D.append(self.chi * (P[t] - P[t-1]) + self.sigma_c * np.random.randn(1).item())
+        else:
+            self.D.append(0)
         return self.D[t]
 
  

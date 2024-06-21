@@ -93,14 +93,18 @@ class Network():
                 phi = np.abs(np.random.normal(1,0.5))
                 # phi = 1.00
                 sigma_f =  0.681
-                pstar = 0 
-                traders.append(Fundamentalist(i,eta,alpha_w,alpha_O,alpha_p,phi,sigma_f,pstar))
+                pstar = 0
+                lookback_period = np.maximum(1,int(np.random.normal(5,1)))
+                max_risk = np.abs(np.random.normal(0.20,0.05)) 
+                traders.append(Fundamentalist(i,eta,alpha_w,alpha_O,alpha_p,phi,sigma_f,pstar,lookback_period,max_risk))
             if trader_type == 'chartist':
                 eta = 0.991
                 chi = np.abs(np.random.normal(1.20,0.5))
                 # chi = 1.20
                 sigma_c = 1.724
-                traders.append(Chartist(i, eta, chi,sigma_c))
+                lookback_period = np.maximum(1,int(np.random.normal(5,1)))
+                max_risk = np.abs(np.random.normal(0.20,0.05))
+                traders.append(Chartist(i, eta, chi,sigma_c,lookback_period,max_risk))
             # if trader_type == 'random trader':
             #     traders.append(RandomTrader(i))
         return traders
