@@ -82,10 +82,13 @@ class Network():
         traders = [] 
 
         # generate the different fractions of traders
+        Nc = 0
+        Nf = 0 
         for i in range(self.number_of_traders):
             random.shuffle(trader_types)
             trader_type = trader_types.pop()
             if trader_type == 'fundamentalist':
+                Nf += 1
                 eta = 0.991
                 alpha_w = 2668
                 alpha_O = 2.1
@@ -94,17 +97,18 @@ class Network():
                 # phi = 1.00
                 sigma_f =  0.681
                 pstar = 0
-                lookback_period = np.maximum(1,int(np.random.normal(5,1)))
-                max_risk = np.abs(np.random.normal(0.20,0.05)) 
+                lookback_period = 5 if Nf/num_fund > 0.5 else  1
+                max_risk = 0.5 if Nf/num_fund > 0.5 else  0.1
                 traders.append(Fundamentalist(i,eta,alpha_w,alpha_O,alpha_p,phi,sigma_f,pstar,lookback_period,max_risk))
             if trader_type == 'chartist':
+                Nc += 1
                 eta = 0.991
                 chi = np.abs(np.random.normal(1.20,0.5))
                 # chi = 1.20
                 sigma_c = 1.724
-                lookback_period = np.maximum(1,int(np.random.normal(5,1)))
-                max_risk = np.abs(np.random.normal(0.20,0.05))
-                traders.append(Chartist(i, eta, chi,sigma_c,lookback_period,max_risk))
+                lookback_period = 5 if Nc/num_fund > 0.5 else  1
+                max_risk =  0.5 if Nc/num_fund > 0.5 else  0.1
+                traders.append(Chartist(i, eta, chi,sigma_c,lookback_period, max_risk))
             # if trader_type == 'random trader':
             #     traders.append(RandomTrader(i))
         return traders
