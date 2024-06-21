@@ -19,7 +19,7 @@ class Network():
         self.percent_fund = percent_fund
         self.percent_chartist = percent_chartist
 
-        self.connectionn_probability = connection_probability
+        self.connection_probability = connection_probability
         self.new_node_edges = new_node_edges
         self.network = None
         self.trader_dictionary = None
@@ -30,6 +30,10 @@ class Network():
         if self.network_type == "barabasi":
                 
             self.network = nx.barabasi_albert_graph(n = self.number_of_traders,  m=self.new_node_edges)
+
+        elif self.network_type == "erdos_renyi":
+
+            self.network = nx.erdos_renyi_graph(n = self.number_of_traders, p = self.connection_probability)
 
         traders  = self.create_traders()
 
@@ -86,14 +90,14 @@ class Network():
                 alpha_w = 2668
                 alpha_O = 2.1
                 alpha_p = 0
-                phi = np.abs(np.random.normal(1,0.1))
+                phi = np.abs(np.random.normal(1,0.5))
                 # phi = 1.00
                 sigma_f =  0.681
                 pstar = 0 
                 traders.append(Fundamentalist(i,eta,alpha_w,alpha_O,alpha_p,phi,sigma_f,pstar))
             if trader_type == 'chartist':
                 eta = 0.991
-                chi = np.abs(np.random.normal(1.20,0.1))
+                chi = np.abs(np.random.normal(1.20,0.5))
                 # chi = 1.20
                 sigma_c = 1.724
                 traders.append(Chartist(i, eta, chi,sigma_c))

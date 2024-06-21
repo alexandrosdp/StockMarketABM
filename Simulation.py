@@ -24,14 +24,14 @@ class Market:
         self.Nc.append(1 - self.Nf[t])
 
     def calculate_A(self, t):
-        self.A.append(self.alpha_w * (self.fundamentalist.Wf[t] - self.chartist.Wc[t]) + self.alpha_O + self.alpha_p * (self.fundamentalist.pstar - self.prices[t])**2)
+        self.A.append(self.alpha_w * (self.fundamentalist.W[t] - self.chartist.W[t]) + self.alpha_O + self.alpha_p * (self.fundamentalist.pstar - self.prices[t])**2)
 
     def calculate_demands(self, t):
         self.fundamentalist.calculate_demand(self.prices, t)
         self.chartist.calculate_demand(self.prices, t)
 
     def update_price(self, t):
-        new_price = self.prices[t] + self.mu * ( self.Nf[t] * self.fundamentalist.Df[t] + self.Nc[t] * self.chartist.Dc[t])
+        new_price = self.prices[t] + self.mu * ( self.Nf[t] * self.fundamentalist.D[t] + self.Nc[t] * self.chartist.D[t])
         self.prices.append(new_price)
 
 def run_simulation(initial_price, time_steps):
@@ -74,7 +74,7 @@ if __name__ == '__main__':
     rr = np.array(prices[1:T+1]) - np.array(prices[0:T])
 
     plt.figure()
-    plt.plot(prices)
+    plt.plot(np.exp(prices))
     plt.xlabel('Time')
     plt.ylabel('Price')
     plt.title('Discrete Choice Approach: Wealth')

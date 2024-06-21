@@ -4,6 +4,10 @@ from Fundamentalist import Fundamentalist
 from Chartist import Chartist
 import matplotlib.pyplot as plt
 from Network import Network
+import statsmodels.api as sm
+from scipy.stats import kurtosis
+from scipy.stats import norm
+from statsmodels.graphics.tsaplots import plot_acf
 
 
 class Market:
@@ -25,13 +29,19 @@ class Market:
         # loop over all agents and update their strategies
         for agent in self.network.trader_dictionary.values():
             agent_node_number = agent.node_number
-            agent_profit_list = agent.profits
-            neighbors = self.network.get_neighbors(agent.node_number)
-            profits = [neighbor.profit for neighbor in neighbors]
-            if agent.profit < np.max(profits):
-                self.network.trader_dictionary[agent_node_number] = neighbors[np.argmax(profits)]
-                self.network.trader_dictionary[agent_node_number].profit_list = agent_profit_list
+            agent_W = agent.W
+            agent_G = agent.G
+            agent_D = agent.D
+
+            neighbor_node_numbers = self.network.get_neighbors(agent.node_number)
+            neighbors = [self.network.trader_dictionary[neighbor] for neighbor in neighbor_node_numbers]
+            perfomances = [neighbor.G[t] for neighbor in neighbors]
+            if agent_G[t] < np.max(perfomances):
+                self.network.trader_dictionary[agent_node_number] = neighbors[np.argmax(perfomances)]  
                 self.network.trader_dictionary[agent_node_number].node_number = agent_node_number
+                self.network.trader_dictionary[agent_node_number].W = agent_W 
+                self.network.trader_dictionary[agent_node_number].G = agent_G
+                self.network.trader_dictionary[agent_node_number].D = agent_D
 
     def calculate_demands(self, t):
         # loop over all agents and update their demands
@@ -47,34 +57,62 @@ class Market:
         self.prices.append(new_price)
 
 def run_simulation(initial_price, time_steps):
-    network = Network(network_type='barabasi', number_of_traders = 100, percent_fund=0.5, percent_chartist=0.5,new_node_edges=3)
+    network = Network(network_type= 'barabasi', number_of_traders = 30, percent_fund=0.5, percent_chartist=0.5,new_node_edges=3, connection_probability=0.1)
     network.create_network()
     prices = [initial_price, initial_price, initial_price]  # Ensure enough initial prices for the first calculations
     market = Market(network, mu=0.01, prices=prices, beta=1, alpha_w=2668, alpha_O=2.1, alpha_p=0)
 
     for t in range(2, time_steps):
+
+        for agent in network.trader_dictionary.values():
+            agent.update_performance(market.prices, t)
+            agent.update_wealth(t)
         
         # update strategies for all agents
-        # market.network.update_strategies(t)
+        market.update_strategies(t)
         # Calculate the demands of all agents
         market.calculate_demands(t)
 
         # Update price
         market.update_price(t)
 
-    return market.prices
+    return market
 
 if __name__ == '__main__':
     initial_price = 0
-    T = 7000
+    T = 10000
     pstar = 0
 
-    prices = run_simulation(initial_price, T)
+    market = run_simulation(initial_price, T)
+
+    prices = market.prices
+
+    # store the profits of the agents
+    profit_dict = {}
+    for agent in market.network.trader_dictionary.values():
+        profit_dict[agent.node_number] = agent.G
+
+    wealth_dict = {}
+    for agent in market.network.trader_dictionary.values():
+        wealth_dict[agent.node_number] = agent.W
+    
+    demand_dict = {}
+    for agent in market.network.trader_dictionary.values():
+        demand_dict[agent.node_number] = agent.D
+
+    # plot the wealth of the agents
+    plt.figure()
+    for agent in market.network.trader_dictionary.values():
+        plt.plot(agent.W)
+    plt.xlabel('Time')
+    plt.ylabel('Wealth')
+    plt.title('Discrete Choice Approach: Wealth')
+    plt.show()
 
     rr = np.array(prices[1:T+1]) - np.array(prices[0:T])
 
     plt.figure()
-    plt.plot(prices)
+    plt.plot(np.exp(prices))
     plt.xlabel('Time')
     plt.ylabel('Price')
     plt.title('Discrete Choice Approach: Wealth')
@@ -86,5 +124,16 @@ if __name__ == '__main__':
     plt.xlabel('Time')
     plt.ylabel('Returns')
     ax_r.set_title('Discrete Choice Approach:Wealth')
+    plt.show()
+
+    plt.hist(rr.flatten(),bins=80, density=True, alpha=0.8, color='b', edgecolor='black', linewidth=1.2)
+    # Fit a normal distribution to the data
+    mu, std = norm.fit(rr.flatten())
+    xmin, xmax = plt.xlim()
+    x = np.linspace(xmin, xmax, 100)
+    p = norm.pdf(x, mu, std)
+
+    # Plot normal distribution curve
+    plt.plot(x, p, 'k', linewidth=2)
     plt.show()
 
