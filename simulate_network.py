@@ -72,7 +72,7 @@ class Market:
         self.prices.append(new_price)
 
 def run_simulation(initial_price, time_steps):
-    network = Network(network_type= 'erdos_renyi', number_of_traders = 500, percent_fund=0.5, percent_chartist=0.5,new_node_edges=3, connection_probability=0.1)
+    network = Network(network_type= 'barabasi', number_of_traders = 150, percent_fund=0.5, percent_chartist=0.5,new_node_edges=5, connection_probability=0.5)
     network.create_network()
     prices = [initial_price, initial_price, initial_price]  # Ensure enough initial prices for the first calculations
     market = Market(network, mu=0.01, prices=prices, beta=1, alpha_w=2668, alpha_O=2.1, alpha_p=0)
@@ -94,12 +94,14 @@ def run_simulation(initial_price, time_steps):
         progress_bar(t / time_steps) 
 
     clear_progress_bar()
+    
+    network.display_network()
 
     return market
 
 if __name__ == '__main__':
     initial_price = 0
-    T = 1000
+    T =  8000
     pstar = 0
 
     market = run_simulation(initial_price, T)
