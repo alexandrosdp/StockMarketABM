@@ -120,6 +120,13 @@ class Experiment():
 
         period = 30
         
+        drop_magnitude = 0
+
+        biggest_drop = None
+
+        if len(market.prices) == len(np.diff(market.prices)):
+            print('rrrr')
+
         # get the index of highest negative returns
         indices = np.argsort(np.diff(market.prices))[0:10]
 
@@ -136,20 +143,33 @@ class Experiment():
                 curr_index += 1
                 
 
-            drop_lengths.append((index,length))
+            # drop_lengths.append((index,length))
 
-        max_index = np.max(drop_lengths)
-        
+            curr_index = index
+
+            while (np.diff(market.prices)[curr_index - 1] < 0):
+
+                    curr_index -= 1
+            
+            drop_lengths.append((curr_index, index+length))
+
+
+            # calculate drop magnitude
+            if  np.sum(np.diff(market.prices)[curr_index:index+length+1]) < drop_magnitude:
+                drop_magnitude = np.sum(np.diff(market.prices)[curr_index:index+length+1])
+                biggest_drop = (curr_index, index+length)
+
          
-        print(drop_lengths)
+        # print(drop_lengths)
 
-        if np.max(market.prices[index: np.maximum(index+period, len(market.prices)-1)]) - market.prices[index] > np.diff(market.prices)[index] * 0.5 and np.diff(market.prices)[index] < - 0.04:
-                # print("Flash Crash Detected at time: ", index)
-                crash_indices.append(index)
+        # if np.max(market.prices[index+length: np.maximum(index+length+period, len(market.prices)-1)]) - market.prices[index+length] > np.sum(np.diff(market.prices)[index:index+length]) * 0.5 and np.diff(market.prices)[index] < - 0.04:
+        #         # print("Flash Crash Detected at time: ", index)
+        #         crash_indices.append(index)
 
         plt.figure()
         plt.plot(np.exp(market.prices))
-        #plt.scatter(crash_indices, np.exp(market.prices)[crash_indices], color='red', label='Flash Crash')
+        plt.scatter(biggest_drop[0], np.exp(market.prices)[biggest_drop[0]], color='red', label='Flash Crash start')
+        plt.scatter(biggest_drop[1]+1, np.exp(market.prices)[biggest_drop[1]+1], color='red', label='Flash Crash start')
         plt.xlabel('Time')
         plt.ylabel('Price')
         plt.title('Discrete Choice Approach: Flash Crash Detection')
