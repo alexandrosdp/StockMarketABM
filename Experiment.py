@@ -8,6 +8,9 @@ from simulate_network import Market
 from utils import progress_bar, clear_progress_bar
 import matplotlib.pyplot as plt
 import numpy as np
+import statsmodels.api as sm
+from statsmodels.graphics.tsaplots import plot_acf
+from statsmodels.stats.diagnostic import acorr_ljungbox
 
 class Experiment():
 
@@ -59,9 +62,20 @@ class Experiment():
         clear_progress_bar()
         
         #network.display_network()
-
-    
         return market
+    
+    def analyze_autocorrelation(self, parameter_series):
+        # plot（ACF）
+        plot_acf(parameter_series, lags=40)
+        plt.title('Autocorrelation Function (ACF)')
+        plt.xlabel('Lags')
+        plt.ylabel('Autocorrelation')
+        plt.show()
+
+        # Ljung-Box test
+        ljung_box_result = acorr_ljungbox(parameter_series, lags=[20], return_df=True)
+        print("Ljung-Box Test Results:")
+        print(ljung_box_result)
     
     def flash_crash_experiment(self):
 
@@ -88,5 +102,10 @@ if __name__ == "__main__":
 
     experiment = Experiment(initial_price=0, time_steps=100)
     experiment.flash_crash_experiment()
+
+    market = experiment.run_simulation()  # Ensure proper recepte market
+    
+    # Analyze autocorrelation of prices
+    experiment.analyze_autocorrelation(market.prices)
 
         
