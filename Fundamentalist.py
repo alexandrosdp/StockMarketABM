@@ -26,6 +26,10 @@ class Fundamentalist:
         self.W.append(self.eta * self.W[t-1] + (1 - self.eta) * self.G[t])
 
     def calculate_demand(self, P, t):
+        if len(P) > 90:
+            P_v = P[-90:]
+        else:
+            P_v = P
         vol = np.std(np.diff(P)) * np.sqrt(252)
         if vol <= self.max_risk:
             self.D.append(self.phi * (self.pstar - P[t]) + self.sigma_f * np.random.randn(1).item())

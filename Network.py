@@ -99,12 +99,12 @@ class Network():
                 alpha_w = 2668
                 alpha_O = 2.1
                 alpha_p = 0
-                phi = np.abs(np.random.normal(1,0.5))
-                # phi = 1.00
+                # phi = np.abs(np.random.normal(1,0.5))
+                phi = 1.00
                 sigma_f =  0.681
-                pstar = 0
-                lookback_period = self.high_lookback if Nf/num_fund > self.percent_rational else  self.low_lookback
-                max_risk = self.high_risk if Nf/num_fund > self.percent_risky else  self.low_risk
+                pstar = 0.02
+                lookback_period = self.high_lookback if Nf/num_fund < self.percent_rational else  self.low_lookback
+                max_risk = self.high_risk if Nf/num_fund < self.percent_risky else  self.low_risk
                 traders.append(Fundamentalist(i,eta,alpha_w,alpha_O,alpha_p,phi,sigma_f,pstar,lookback_period,max_risk))
             if trader_type == 'chartist':
                 Nc += 1
@@ -112,8 +112,8 @@ class Network():
                 chi = np.abs(np.random.normal(1.20,0.5))
                 # chi = 1.20
                 sigma_c = 1.724
-                lookback_period = self.high_lookback if Nc/num_chart > self.percent_rational else  self.low_lookback
-                max_risk =  self.high_risk if Nc/num_fund > self.percent_risky else  self.low_risk
+                lookback_period = self.high_lookback if Nc/num_chart < self.percent_rational else  self.low_lookback
+                max_risk =  self.high_risk if Nc/num_fund < self.percent_risky else  self.low_risk
                 traders.append(Chartist(i, eta, chi,sigma_c,lookback_period, max_risk))
             # if trader_type == 'random trader':
             #     traders.append(RandomTrader(i))

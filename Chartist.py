@@ -22,7 +22,11 @@ class Chartist:
         self.W.append(self.eta * self.W[t-1] + (1 - self.eta) * self.G[t])
 
     def calculate_demand(self, P, t):
-        vol = np.std(np.diff(P)) * np.sqrt(252)
+        if len(P) > 30:
+            P_v = P[-30:]
+        else:
+            P_v = P
+        vol = np.std(np.diff(P_v)) * np.sqrt(252)
         if vol <= self.max_risk:
             self.D.append(self.chi * (P[t] - P[t-1]) + self.sigma_c * np.random.randn(1).item())
         else:

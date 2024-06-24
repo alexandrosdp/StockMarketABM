@@ -124,48 +124,38 @@ class Experiment():
 
         biggest_drop = None
 
-        if len(market.prices) == len(np.diff(market.prices)):
-            print('rrrr')
-
         # get the index of highest negative returns
-        indices = np.argsort(np.diff(market.prices))[0:10]
+        indices = np.argsort(np.diff(market.prices))[0:30]
 
         drop_lengths = []
 
         for index in indices:
 
-            length = 0
-            curr_index = index
+            start_index = index
 
-            while (np.diff(market.prices)[curr_index + 1] < 0):
+            while (np.diff(market.prices)[start_index - 1] < 0) and start_index > 0:
+
+                start_index -= 1
+
+            end_index = start_index
+
+            while (np.diff(market.prices)[end_index + 1] < 0) and end_index < len(np.diff(market.prices)) - 3:
                 
-                length += 1
-                curr_index += 1
-                
-
-            # drop_lengths.append((index,length))
-
-            curr_index = index
-
-            while (np.diff(market.prices)[curr_index - 1] < 0):
-
-                    curr_index -= 1
+                end_index += 1
             
-            drop_lengths.append((curr_index, index+length))
+            drop_lengths.append((start_index, end_index))
 
 
             # calculate drop magnitude
-            if  np.sum(np.diff(market.prices)[curr_index:index+length+1]) < drop_magnitude:
-                drop_magnitude = np.sum(np.diff(market.prices)[curr_index:index+length+1])
-                biggest_drop = (curr_index, index+length)
+            if  np.sum(np.diff(market.prices)[start_index:end_index+1]) < drop_magnitude:
+                drop_magnitude = np.sum(np.diff(market.prices)[start_index:end_index+1])
+                biggest_drop = (start_index, end_index)
 
-         
-        # print(drop_lengths)
+        if np.max(market.prices[end_index + 1: np.maximum(end_index+1+period, len(market.prices)-1)]) - market.prices[end_index+1] > np.sum(np.diff(market.prices)[start_index:end_index+1]) * 0.5 and np.sum(np.diff(market.prices)[start_index:end_index+1]) < - 0.03:
+                print("Flash Crash Detected at time: ", index)
+                crash_indices.append((start_index, end_index))
 
-        # if np.max(market.prices[index+length: np.maximum(index+length+period, len(market.prices)-1)]) - market.prices[index+length] > np.sum(np.diff(market.prices)[index:index+length]) * 0.5 and np.diff(market.prices)[index] < - 0.04:
-        #         # print("Flash Crash Detected at time: ", index)
-        #         crash_indices.append(index)
-
+        print("Biggest Drop: ", drop_magnitude)
         plt.figure()
         plt.plot(np.exp(market.prices))
         plt.scatter(biggest_drop[0], np.exp(market.prices)[biggest_drop[0]], color='red', label='Flash Crash start')
@@ -174,6 +164,15 @@ class Experiment():
         plt.ylabel('Price')
         plt.title('Discrete Choice Approach: Flash Crash Detection')
         plt.show()
+
+        rr = np.array(market.prices[1:self.time_steps+1]) - np.array(market.prices[0:self.time_steps])
+        plt.figure()
+        plt.plot(range(self.time_steps), rr)
+        plt.xlabel('Time')
+        plt.ylabel('Returns')
+        plt.title('Discrete Choice Approach:Wealth')
+        plt.show()
+
 
     def fat_tail_experiment(self):
 
@@ -185,14 +184,14 @@ class Experiment():
 if __name__ == "__main__":
 
      experiment = Experiment(initial_price=0, 
-                            time_steps=1000,
+                            time_steps=500,
                             network_type="barabasi",
                             number_of_traders=150,
                             percent_fund=0.50,
                             percent_chartist=0.50,
                             percent_rational=0.50,
-                            percent_risky=0.50,
-                            high_lookback=5,
+                            percent_risky=0.050,
+                            high_lookback=10,
                             low_lookback=1,
                             high_risk=0.50,
                             low_risk=0.10,
