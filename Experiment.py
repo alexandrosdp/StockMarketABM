@@ -111,6 +111,7 @@ class Experiment():
 
     def flash_crash_experiment(self):
 
+    
         market = self.run_simulation()
 
         "TODO: Add logic to check for flash crash"
@@ -122,14 +123,33 @@ class Experiment():
         # get the index of highest negative returns
         indices = np.argsort(np.diff(market.prices))[0:10]
 
+        drop_lengths = []
+
         for index in indices:
-            if np.max(market.prices[index: np.maximum(index+period, len(market.prices)-1)]) - market.prices[index] > np.diff(market.prices)[index] * 0.5 and np.diff(market.prices)[index] < - 0.04:
+
+            length = 0
+            curr_index = index
+
+            while (np.diff(market.prices)[curr_index + 1] < 0):
+                
+                length += 1
+                curr_index += 1
+                
+
+            drop_lengths.append((index,length))
+
+        max_index = np.max(drop_lengths)
+        
+         
+        print(drop_lengths)
+
+        if np.max(market.prices[index: np.maximum(index+period, len(market.prices)-1)]) - market.prices[index] > np.diff(market.prices)[index] * 0.5 and np.diff(market.prices)[index] < - 0.04:
                 # print("Flash Crash Detected at time: ", index)
                 crash_indices.append(index)
 
         plt.figure()
         plt.plot(np.exp(market.prices))
-        plt.scatter(crash_indices, np.exp(market.prices)[crash_indices], color='red', label='Flash Crash')
+        #plt.scatter(crash_indices, np.exp(market.prices)[crash_indices], color='red', label='Flash Crash')
         plt.xlabel('Time')
         plt.ylabel('Price')
         plt.title('Discrete Choice Approach: Flash Crash Detection')
@@ -144,14 +164,34 @@ class Experiment():
 
 if __name__ == "__main__":
 
-    # experiment = Experiment(initial_price=0, time_steps=1000)
-    # experiment.flash_crash_experiment()
+     experiment = Experiment(initial_price=0, 
+                            time_steps=1000,
+                            network_type="barabasi",
+                            number_of_traders=150,
+                            percent_fund=0.50,
+                            percent_chartist=0.50,
+                            percent_rational=0.50,
+                            percent_risky=0.50,
+                            high_lookback=5,
+                            low_lookback=1,
+                            high_risk=0.50,
+                            low_risk=0.10,
+                            new_node_edges=5,
+                            connection_probability=0.50,
+                            mu=0.01,
+                            beta=1,
+                            alpha_w=2668,
+                            alpha_O=2.1,
+                            alpha_p=0
+                            )
+     experiment.flash_crash_experiment()
 
+    
     # # market = experiment.run_simulation()  # Ensure proper recepte market
 
     # Analyze autocorrelation of prices
     # experiment.analyze_autocorrelation(market.prices)
     # do we do initial price from 0? here l set it as 1
     # Ensure initial_price is more than 0 to avoid log(0) issues.
-    experiment = Experiment(initial_price=1, time_steps=100)
-    experiment.analyze_volatility_clustering()
+    # experiment = Experiment(initial_price=1, time_steps=100)
+    # experiment.analyze_volatility_clustering()
