@@ -11,7 +11,7 @@ import numpy as np
 
 class Experiment():
 
-    def __init__(self, initial_price, time_steps, network_type= 'barabasi', number_of_traders = 150, percent_fund=0.5, percent_chartist=0.5,new_node_edges=5, connection_probability=0.5, network = 'barabasi', mu=0.01, beta=1, alpha_w=2668, alpha_O=2.1, alpha_p=0):
+    def __init__(self, initial_price, time_steps, network_type= 'barabasi', number_of_traders = 150, percent_fund=0.5, percent_chartist=0.5,percent_rational = 0.50, percent_risky = 0.50, high_lookback = 5, low_lookback = 1, high_risk = 0.50, low_risk = 0.10, new_node_edges=5, connection_probability=0.5, mu=0.01, beta=1, alpha_w=2668, alpha_O=2.1, alpha_p=0):
         
        self.initial_price = initial_price
        self.time_steps = time_steps
@@ -19,6 +19,12 @@ class Experiment():
        self.number_of_traders = number_of_traders
        self.percent_fund = percent_fund 
        self.percent_chartist= percent_chartist
+       self.percent_rational = percent_rational
+       self.percent_risky = percent_risky
+       self.high_lookback = high_lookback 
+       self.low_lookback = low_lookback
+       self.high_risk = high_risk
+       self.low_risk = low_risk
        self.new_node_edges= new_node_edges
        self.connection_probability = connection_probability 
        self.mu = mu
@@ -29,7 +35,7 @@ class Experiment():
 
     
     def run_simulation(self):
-        network = Network(network_type = self.network_type, number_of_traders = self.number_of_traders, percent_fund=self.percent_fund, percent_chartist= self.percent_chartist,new_node_edges=self.new_node_edges, connection_probability=self.connection_probability)
+        network = Network(network_type = self.network_type, number_of_traders = self.number_of_traders, percent_fund=self.percent_fund, percent_chartist= self.percent_chartist,percent_rational = self.percent_rational, percent_risky = self.percent_risky, high_lookback = self.high_lookback, low_lookback = self.low_lookback, high_risk = self.high_risk, low_risk = self.low_risk,new_node_edges=self.new_node_edges, connection_probability=self.connection_probability)
         network.create_network()
         prices = [self.initial_price, self.initial_price, self.initial_price]  # Ensure enough initial prices for the first calculations
         market = Market(network, mu=self.mu, prices=prices, beta=self.beta, alpha_w=self.alpha_w, alpha_O=self.alpha_O, alpha_p=self.alpha_p)

@@ -112,7 +112,7 @@ class Network():
                 chi = np.abs(np.random.normal(1.20,0.5))
                 # chi = 1.20
                 sigma_c = 1.724
-                lookback_period = self.high_lookback if Nc/num_fund > self.percent_rational else  self.low_lookback
+                lookback_period = self.high_lookback if Nc/num_chart > self.percent_rational else  self.low_lookback
                 max_risk =  self.high_risk if Nc/num_fund > self.percent_risky else  self.low_risk
                 traders.append(Chartist(i, eta, chi,sigma_c,lookback_period, max_risk))
             # if trader_type == 'random trader':
