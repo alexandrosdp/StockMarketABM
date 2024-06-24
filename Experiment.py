@@ -83,12 +83,24 @@ class Experiment():
 
         "TODO: Add logic to check for flash crash"
 
+        crash_indices = []
+
+        period = 30
+        
+        # get the index of highest negative returns
+        indices = np.argsort(np.diff(market.prices))[0:10]
+
+        for index in indices:
+            if np.max(market.prices[index: np.maximum(index+period, len(market.prices)-1)]) - market.prices[index] > np.diff(market.prices)[index] * 0.5 and np.diff(market.prices)[index] < - 0.04:
+                # print("Flash Crash Detected at time: ", index)
+                crash_indices.append(index)
 
         plt.figure()
         plt.plot(np.exp(market.prices))
+        plt.scatter(crash_indices, np.exp(market.prices)[crash_indices], color='red', label='Flash Crash')
         plt.xlabel('Time')
         plt.ylabel('Price')
-        plt.title('Discrete Choice Approach: Wealth')
+        plt.title('Discrete Choice Approach: Flash Crash Detection')
         plt.show()
     
     def fat_tail_experiment(self):
@@ -100,12 +112,12 @@ class Experiment():
 
 if __name__ == "__main__":
 
-    experiment = Experiment(initial_price=0, time_steps=100)
+    experiment = Experiment(initial_price=0, time_steps=1000)
     experiment.flash_crash_experiment()
 
-    market = experiment.run_simulation()  # Ensure proper recepte market
+    # market = experiment.run_simulation()  # Ensure proper recepte market
     
     # Analyze autocorrelation of prices
-    experiment.analyze_autocorrelation(market.prices)
+    # experiment.analyze_autocorrelation(market.prices)
 
         
