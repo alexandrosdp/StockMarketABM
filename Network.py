@@ -12,12 +12,18 @@ import numpy as np
 
 class Network():
 
-    def __init__(self, network_type, number_of_traders, percent_fund, percent_chartist, new_node_edges = None, connection_probability = None):
+    def __init__(self, network_type, number_of_traders, percent_fund, percent_chartist, percent_rational = 0.50,percent_risky = 0.50, high_lookback = 5, low_lookback = 1, high_risk = 0.50, low_risk = 0.10,  new_node_edges = None, connection_probability = None):
 
         self.network_type = network_type
         self.number_of_traders = number_of_traders
         self.percent_fund = percent_fund
         self.percent_chartist = percent_chartist
+        self.percent_rational = percent_rational
+        self.percent_risky = percent_risky
+        self.high_lookback = high_lookback 
+        self.low_lookback = low_lookback
+        self.high_risk = high_risk, 
+        self.low_risk = low_risk
 
         self.connection_probability = connection_probability
         self.new_node_edges = new_node_edges
@@ -97,8 +103,8 @@ class Network():
                 # phi = 1.00
                 sigma_f =  0.681
                 pstar = 0
-                lookback_period = 5 if Nf/num_fund > 0.5 else  1
-                max_risk = 0.5 if Nf/num_fund > 0.5 else  0.1
+                lookback_period = self.high_lookback if Nf/num_fund > self.percent_rational else  self.low_lookback
+                max_risk = self.high_risk if Nf/num_fund > self.percent_risky else  self.low_risk
                 traders.append(Fundamentalist(i,eta,alpha_w,alpha_O,alpha_p,phi,sigma_f,pstar,lookback_period,max_risk))
             if trader_type == 'chartist':
                 Nc += 1
@@ -106,8 +112,8 @@ class Network():
                 chi = np.abs(np.random.normal(1.20,0.5))
                 # chi = 1.20
                 sigma_c = 1.724
-                lookback_period = 5 if Nc/num_fund > 0.5 else  1
-                max_risk =  0.5 if Nc/num_fund > 0.5 else  0.1
+                lookback_period = self.high_lookback if Nc/num_fund > self.percent_rational else  self.low_lookback
+                max_risk =  self.high_risk if Nc/num_fund > self.percent_risky else  self.low_risk
                 traders.append(Chartist(i, eta, chi,sigma_c,lookback_period, max_risk))
             # if trader_type == 'random trader':
             #     traders.append(RandomTrader(i))
