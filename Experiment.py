@@ -67,19 +67,21 @@ class Experiment():
         # network.display_network()
         return market
 
-    def analyze_autocorrelation(self, parameter_series):
+    def analyze_autocorrelation_of_returns(self, prices):    
+        returns = np.diff(prices)
+
         # plot（ACF）
-        plot_acf(parameter_series, lags=40)
-        plt.title('Autocorrelation Function (ACF)')
+        plot_acf(returns, lags=40)
+        plt.title('Autocorrelation Function (ACF) of Returns')
         plt.xlabel('Lags')
         plt.ylabel('Autocorrelation')
         plt.show()
 
         # Ljung-Box test
-        ljung_box_result = acorr_ljungbox(
-            parameter_series, lags=[20], return_df=True)
+        ljung_box_result = acorr_ljungbox(returns, lags=[20], return_df=True)
         print("Ljung-Box Test Results:")
         print(ljung_box_result)
+
 
     def analyze_volatility_clustering(self):
         prices = self.run_simulation().prices
@@ -204,10 +206,8 @@ if __name__ == "__main__":
                             alpha_p=0
                             )
      experiment.flash_crash_experiment()
-
-    
-    # # market = experiment.run_simulation()  # Ensure proper recepte market
-
+     market = experiment.run_simulation()  # Ensure proper recepte market
+     experiment.analyze_autocorrelation_of_returns(market.prices)
     # Analyze autocorrelation of prices
     # experiment.analyze_autocorrelation(market.prices)
     # do we do initial price from 0? here l set it as 1
