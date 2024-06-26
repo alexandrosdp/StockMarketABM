@@ -11,6 +11,7 @@ import numpy as np
 import statsmodels.api as sm
 from statsmodels.graphics.tsaplots import plot_acf
 from statsmodels.stats.diagnostic import acorr_ljungbox
+import pandas as pd
 
 
 class Experiment():
@@ -111,7 +112,7 @@ class Experiment():
         plt.tight_layout()
         plt.show()
 
-    def flash_crash_experiment(self):
+    def crash_experiment(self):
 
     
         market = self.run_simulation()
@@ -157,23 +158,45 @@ class Experiment():
                 print("Flash Crash Detected at time: ", index)
                 crash_indices.append((start_index, end_index))
 
-        print("Biggest Drop: ", drop_magnitude)
-        plt.figure()
-        plt.plot(np.exp(market.prices))
-        plt.scatter(biggest_drop[0], np.exp(market.prices)[biggest_drop[0]], color='red', label='Flash Crash start')
-        plt.scatter(biggest_drop[1]+1, np.exp(market.prices)[biggest_drop[1]+1], color='red', label='Flash Crash start')
-        plt.xlabel('Time')
-        plt.ylabel('Price')
-        plt.title('Discrete Choice Approach: Flash Crash Detection')
-        plt.show()
+        if drop_magnitude <= -0.07:
+            print("CRASH DETECTED")
+            return 1
+        else:
+            return 0
 
-        rr = np.array(market.prices[1:self.time_steps+1]) - np.array(market.prices[0:self.time_steps])
-        plt.figure()
-        plt.plot(range(self.time_steps), rr)
-        plt.xlabel('Time')
-        plt.ylabel('Returns')
-        plt.title('Discrete Choice Approach:Wealth')
-        plt.show()
+
+        # print("Biggest Drop: ", drop_magnitude)
+        # plt.figure()
+        # plt.plot(np.exp(market.prices))
+        # plt.scatter(biggest_drop[0], np.exp(market.prices)[biggest_drop[0]], color='red', label='Flash Crash start')
+        # plt.scatter(biggest_drop[1]+1, np.exp(market.prices)[biggest_drop[1]+1], color='red', label='Flash Crash start')
+        # plt.xlabel('Time')
+        # plt.ylabel('Price')
+        # plt.title('Discrete Choice Approach: Flash Crash Detection')
+        # plt.show()
+
+        # rr = np.array(market.prices[1:self.time_steps+1]) - np.array(market.prices[0:self.time_steps])
+        # plt.figure()
+        # plt.plot(range(self.time_steps), rr)
+        # plt.xlabel('Time')
+        # plt.ylabel('Returns')
+        # plt.title('Discrete Choice Approach:Wealth')
+        # plt.show()
+
+
+    def multiple_runs_crash(self,n_runs):
+
+        """Running the crash experiment multiple times"""
+
+
+        crash_count = 0
+
+        for i in range(n_runs):
+
+            crash = self.crash_experiment() #Crash returns either 0  or 1
+            crash_count += crash
+
+        return crash_count
 
 
     def fat_tail_experiment(self):
@@ -183,31 +206,79 @@ class Experiment():
         "TODO: Add logic to check for flat tails"
 
 
+
+
+
 if __name__ == "__main__":
 
-     experiment = Experiment(initial_price=0, 
-                            time_steps=500,
-                            network_type="barabasi",
-                            number_of_traders=150,
-                            percent_fund=0.50,
-                            percent_chartist=0.50,
-                            percent_rational=0.50,
-                            percent_risky=0.050,
-                            high_lookback=10,
-                            low_lookback=1,
-                            high_risk=0.50,
-                            low_risk=0.10,
-                            new_node_edges=5,
-                            connection_probability=0.50,
-                            mu=0.01,
-                            beta=1,
-                            alpha_w=2668,
-                            alpha_O=2.1,
-                            alpha_p=0
-                            )
-     experiment.flash_crash_experiment()
-     market = experiment.run_simulation()  # Ensure proper recepte market
-     experiment.analyze_autocorrelation_of_returns(market.prices)
+
+    params = {'initial_price': 0,
+        'time_steps': 2000,
+        'network_type': 'barabasi',
+        'number_of_traders': 150,
+        'percent_fund': 0.50,
+        'percent_chartist': 0.50,
+        'percent_rational': 0.50,
+        'percent_risky': 0.050,
+        'high_lookback': 10,
+        'low_lookback': 1,
+        'high_risk': 0.50,
+        'low_risk': 0.10,
+        'new_node_edges': 5,
+        'connection_probability': 0.50,
+        'mu': 0.01,
+        'beta': 1,
+        'alpha_w': 2668,
+        'alpha_O': 2.1,
+        'alpha_p': 0}
+
+    experiment = Experiment(
+        initial_price=params['initial_price'],
+        time_steps=params['time_steps'],
+        network_type=params['network_type'],
+        number_of_traders=params['number_of_traders'],
+        percent_fund=params['percent_fund'],
+        percent_chartist=params['percent_chartist'],
+        percent_rational=params['percent_rational'],
+        percent_risky=params['percent_risky'],
+        high_lookback=params['high_lookback'],
+        low_lookback=params['low_lookback'],
+        high_risk=params['high_risk'],
+        low_risk=params['low_risk'],
+        new_node_edges=params['new_node_edges'],
+        connection_probability=params['connection_probability'],
+        mu=params['mu'],
+        beta=params['beta'],
+        alpha_w=params['alpha_w'],
+        alpha_O=params['alpha_O'],
+        alpha_p=params['alpha_p']
+    )
+    
+    crash_results = pd.read_csv('crash_results.csv')
+    
+    results_df = pd.DataFrame(params, index= [crash_results.index[-1] +1])
+
+    crash_count = experiment.multiple_runs_crash(2)
+
+    results_df.loc[0,'No. of crashes'] = crash_count
+
+    crash_results = pd.concat([crash_results, results_df])
+
+    results_df.to_csv('crash_results.csv')
+
+    print(results_df)
+
+
+     
+    # experiment.multiple_runs_crash(n_runs=30)
+
+    # for params in experiment_params:
+    #     num_crashes = run_experiment(params)
+    #     params['num_crashes'] = num_crashes
+    #     results_df = results_df.append(params, ignore_index=True)
+
+
+    #  experiment.analyze_autocorrelation_of_returns(market.prices)
     # Analyze autocorrelation of prices
     # experiment.analyze_autocorrelation(market.prices)
     # do we do initial price from 0? here l set it as 1
