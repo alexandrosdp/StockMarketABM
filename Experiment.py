@@ -142,9 +142,18 @@ class Experiment():
 
             end_index = start_index
 
-            while (np.diff(market.prices)[end_index + 1] < 0) and end_index < len(np.diff(market.prices)) - 3:
+            counter = 1
+
+            if end_index == len(np.diff(market.prices)) -1:
+
+                end_index = start_index
+            else:
+
+                while (np.diff(market.prices)[end_index + 1] < 0) and end_index < len(np.diff(market.prices)) - 3:
                 
-                end_index += 1
+                    end_index += 1  
+
+            
             
             drop_lengths.append((start_index, end_index))
 
@@ -158,8 +167,8 @@ class Experiment():
                 print("Flash Crash Detected at time: ", index)
                 crash_indices.append((start_index, end_index))
 
+        print(drop_magnitude)
         if drop_magnitude <= -0.07:
-            print("CRASH DETECTED")
             return 1
         else:
             return 0
@@ -218,7 +227,7 @@ if __name__ == "__main__":
         'number_of_traders': 150,
         'percent_fund': 0.50,
         'percent_chartist': 0.50,
-        'percent_rational': 0,
+        'percent_rational': 0.50,
         'percent_risky': 0.50,
         'high_lookback': 10,
         'low_lookback': 1,
@@ -259,7 +268,7 @@ if __name__ == "__main__":
     
     results_df = pd.DataFrame(params, index= [0])
 
-    crash_count = experiment.multiple_runs_crash(1)
+    crash_count = experiment.multiple_runs_crash(30)
 
     results_df.loc[0,'No. of crashes'] = crash_count
 
