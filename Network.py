@@ -99,8 +99,8 @@ class Network():
                 alpha_w = 2668
                 alpha_O = 2.1
                 alpha_p = 0
-                # phi = np.abs(np.random.normal(1,0.5))
-                phi = 1.00
+                phi = np.abs(np.random.normal(1,0.5))
+                #phi = 1.00
                 sigma_f =  0.681
                 pstar = 0.02
                 lookback_period = self.high_lookback if Nf/num_fund < self.percent_rational else  self.low_lookback
