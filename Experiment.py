@@ -218,8 +218,8 @@ if __name__ == "__main__":
         'number_of_traders': 150,
         'percent_fund': 0.50,
         'percent_chartist': 0.50,
-        'percent_rational': 0.50,
-        'percent_risky': 0.050,
+        'percent_rational': 0,
+        'percent_risky': 0.50,
         'high_lookback': 10,
         'low_lookback': 1,
         'high_risk': 0.50,
@@ -231,6 +231,7 @@ if __name__ == "__main__":
         'alpha_w': 2668,
         'alpha_O': 2.1,
         'alpha_p': 0}
+
 
     experiment = Experiment(
         initial_price=params['initial_price'],
@@ -254,21 +255,21 @@ if __name__ == "__main__":
         alpha_p=params['alpha_p']
     )
     
-    crash_results = pd.read_csv('crash_results.csv')
+    crash_results_rationality = pd.read_csv('crash_results_rationality.csv')
     
-    results_df = pd.DataFrame(params, index= [crash_results.index[-1] +1])
+    results_df = pd.DataFrame(params, index= [0])
 
-    crash_count = experiment.multiple_runs_crash(2)
+    crash_count = experiment.multiple_runs_crash(1)
 
     results_df.loc[0,'No. of crashes'] = crash_count
 
-    crash_results = pd.concat([crash_results, results_df])
+    crash_results_rationality = pd.concat([crash_results_rationality, results_df], ignore_index=True)
 
-    results_df.to_csv('crash_results.csv')
+    crash_results_rationality.to_csv('crash_results_rationality.csv')
 
-    print(results_df)
+    print(crash_results_rationality)
 
-
+    
      
     # experiment.multiple_runs_crash(n_runs=30)
 
