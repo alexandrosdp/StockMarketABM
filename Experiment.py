@@ -166,12 +166,15 @@ class Experiment():
         if np.max(market.prices[end_index + 1: np.maximum(end_index+1+period, len(market.prices)-1)]) - market.prices[end_index+1] > np.sum(np.diff(market.prices)[start_index:end_index+1]) * 0.5 and np.sum(np.diff(market.prices)[start_index:end_index+1]) < - 0.03:
                 print("Flash Crash Detected at time: ", index)
                 crash_indices.append((start_index, end_index))
+        
+        drop_magnitude_list = []
+        
 
-        print(drop_magnitude)
+        
         if drop_magnitude <= -0.07:
-            return 1
+            return 1, drop_magnitude    
         else:
-            return 0
+            return 0, drop_magnitude
 
 
         # print("Biggest Drop: ", drop_magnitude)
@@ -199,13 +202,15 @@ class Experiment():
 
 
         crash_count = 0
+        drop_magintude_list = []
 
         for i in range(n_runs):
 
-            crash = self.crash_experiment() #Crash returns either 0  or 1
+            crash, drop_magintude = self.crash_experiment() #Crash returns either 0  or 1
             crash_count += crash
+            drop_magintude_list.append(drop_magintude)
 
-        return crash_count
+        return crash_count, drop_magintude_list
 
 
     def fat_tail_experiment(self):
@@ -222,12 +227,12 @@ if __name__ == "__main__":
 
 
     params = {'initial_price': 0,
-        'time_steps': 2000,
+        'time_steps': 100,
         'network_type': 'barabasi',
         'number_of_traders': 150,
         'percent_fund': 0.50,
         'percent_chartist': 0.50,
-        'percent_rational': 0.50,
+        'percent_rational': 0.20,
         'percent_risky': 0.50,
         'high_lookback': 10,
         'low_lookback': 1,
@@ -239,7 +244,8 @@ if __name__ == "__main__":
         'beta': 1,
         'alpha_w': 2668,
         'alpha_O': 2.1,
-        'alpha_p': 0}
+        'alpha_p': 0,
+        }
 
 
     experiment = Experiment(
@@ -265,18 +271,22 @@ if __name__ == "__main__":
     )
     
     crash_results_rationality = pd.read_csv('crash_results_rationality.csv')
-    
+
+    crash_count, drop_magnitude_list = experiment.multiple_runs_crash(2)
+
+    params['No. of crashes'] = crash_count
+    params['Drop magnitude list'] = [drop_magnitude_list]
+
     results_df = pd.DataFrame(params, index= [0])
 
-    crash_count = experiment.multiple_runs_crash(30)
-
-    results_df.loc[0,'No. of crashes'] = crash_count
+    # results_df.loc[0,'No. of crashes'] = crash_count
+    # results_df.at[0,'Drop magnitude list'] = drop_magnitude_list
 
     crash_results_rationality = pd.concat([crash_results_rationality, results_df], ignore_index=True)
 
     crash_results_rationality.to_csv('crash_results_rationality.csv')
 
-    print(crash_results_rationality)
+    print(crash_results_rationality['Drop magnitude list'])
 
     
      

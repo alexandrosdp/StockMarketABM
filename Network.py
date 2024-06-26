@@ -102,7 +102,7 @@ class Network():
                 phi = np.abs(np.random.normal(1,0.5))
                 #phi = 1.00
                 sigma_f =  0.681
-                pstar = 0.02
+                pstar = 0
                 lookback_period = self.high_lookback if Nf/num_fund < self.percent_rational else  self.low_lookback
                 max_risk = self.high_risk if Nf/num_fund < self.percent_risky else  self.low_risk
                 traders.append(Fundamentalist(i,eta,alpha_w,alpha_O,alpha_p,phi,sigma_f,pstar,lookback_period,max_risk))
