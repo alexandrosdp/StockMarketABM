@@ -1,0 +1,2 @@
+,initial_price,time_steps,network_type,number_of_traders,percent_fund,percent_chartist,percent_rational,percent_risky,high_lookback,low_lookback,high_risk,low_risk,new_node_edges,connection_probability,mu,beta,alpha_w,alpha_O,alpha_p,No. of crashes
+0,0,2000,barabasi,150,0.5,0.5,0.5,0.8,10,1,0.5,0.1,5,0.5,0.01,1,2668,2.1,0,0.0
