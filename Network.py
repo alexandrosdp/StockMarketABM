@@ -32,6 +32,8 @@ class Network():
 
 
     def create_network(self):
+        
+        print("Creating network", self.network_type)
 
         if self.network_type == "barabasi":
                 
@@ -40,6 +42,9 @@ class Network():
         elif self.network_type == "erdos_renyi":
 
             self.network = nx.erdos_renyi_graph(n = self.number_of_traders, p = self.connection_probability)
+        elif self.network_type == "small_world":
+            self.network = nx.watts_strogatz_graph(self.number_of_traders, self.new_node_edges, self.connection_probability)
+        
 
         traders  = self.create_traders()
 
@@ -85,7 +90,7 @@ class Network():
         num_fund = int(self.number_of_traders * self.percent_fund)
         num_chart = int(self.number_of_traders * self.percent_chartist)
         trader_types = ['fundamentalist'] * num_fund + ['chartist'] * num_chart 
-        traders = [] 
+        traders = []
 
         # generate the different fractions of traders
         Nc = 0
@@ -99,7 +104,7 @@ class Network():
                 alpha_w = 2668
                 alpha_O = 2.1
                 alpha_p = 0
-                # phi = np.abs(np.random.normal(1,0.5))
+                phi = np.abs(np.random.normal(1,0.5))
                 phi = 1.00
                 sigma_f =  0.681
                 pstar = 0.02

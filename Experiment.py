@@ -11,11 +11,14 @@ import numpy as np
 import statsmodels.api as sm
 from statsmodels.graphics.tsaplots import plot_acf
 from statsmodels.stats.diagnostic import acorr_ljungbox
+import statsmodels.api as sm
+from scipy.stats import kurtosis
+from scipy.stats import norm
 
 
 class Experiment():
 
-    def __init__(self, initial_price, time_steps, network_type='barabasi', number_of_traders=150, percent_fund=0.5, percent_chartist=0.5, percent_rational=0.50, percent_risky=0.50, high_lookback=5, low_lookback=1, high_risk=0.50, low_risk=0.10, new_node_edges=5, connection_probability=0.5, mu=0.01, beta=1, alpha_w=2668, alpha_O=2.1, alpha_p=0):
+    def __init__(self, initial_price, time_steps, network_type='small_world', number_of_traders=150, percent_fund=0.5, percent_chartist=0.5, percent_rational=0.50, percent_risky=0.50, high_lookback=5, low_lookback=1, high_risk=0.50, low_risk=0.10, new_node_edges=5, connection_probability=0.5, mu=0.01, beta=1, alpha_w=2668, alpha_O=2.1, alpha_p=0):
 
         self.initial_price = initial_price
         self.time_steps = time_steps
@@ -60,7 +63,7 @@ class Experiment():
             # Update price
             market.update_price(t)
 
-            progress_bar(t / self.time_steps)
+            #progress_bar(t / self.time_steps)
 
         clear_progress_bar()
 
@@ -176,28 +179,53 @@ class Experiment():
         plt.show()
 
 
-    def fat_tail_experiment(self):
+    def fat_tail_experiment(self, T):
 
         market = self.run_simulation()
 
         "TODO: Add logic to check for flat tails"
+        rr = np.array(market.prices[1:T+1]) - np.array(market.prices[0:T])
+        """ plt.figure()
+        plt.plot(np.exp(market.prices))
+        plt.xlabel('Time')
+        plt.ylabel('Price')
+        #plt.title('Discrete Choice Approach: Wealth')
+        plt.show()
+        sm.qqplot(rr.flatten(), line='s')  # 's' line fit standardizes the data to have the same scale
+        plt.title('QQ Plot')
+        plt.show()
+        plt.hist(rr.flatten(), bins = 50, density=True, alpha=0.8, color='b', edgecolor='black', linewidth=1.2) """
+    # Fit a normal distribution to the data
+        mu, std = norm.fit(rr.flatten())
+        xmin, xmax = plt.xlim()
+        x = np.linspace(xmin, xmax, 100)
+        p = norm.pdf(x, mu, std)
+        # Plot normal distribution curve
+        """ plt.plot(x, p, 'k', linewidth=2)
+        plt.show() """
+        # Calculate kurtosis (K value)
+        kurtosis_value = kurtosis(rr.flatten())
+        print(f"Sample kurtosis (K value): {kurtosis_value}")
+        return kurtosis_value
+        
 
 
 if __name__ == "__main__":
 
-     experiment = Experiment(initial_price=0, 
-                            time_steps=500,
+     
+    experiment = Experiment(initial_price=0, 
+                            time_steps=1000,
                             network_type="barabasi",
-                            number_of_traders=150,
+                            number_of_traders=200,
                             percent_fund=0.50,
                             percent_chartist=0.50,
-                            percent_rational=0.50,
-                            percent_risky=0.050,
-                            high_lookback=10,
+                            percent_rational=0.2,
+                            percent_risky=0.2,
+                            high_lookback=5,
                             low_lookback=1,
-                            high_risk=0.50,
-                            low_risk=0.10,
-                            new_node_edges=5,
+                            high_risk=0.25,
+                            low_risk=0.1,
+                            new_node_edges=6,
                             connection_probability=0.50,
                             mu=0.01,
                             beta=1,
@@ -205,9 +233,10 @@ if __name__ == "__main__":
                             alpha_O=2.1,
                             alpha_p=0
                             )
-     experiment.flash_crash_experiment()
-     market = experiment.run_simulation()  # Ensure proper recepte market
-     experiment.analyze_autocorrelation_of_returns(market.prices)
+     #experiment.flash_crash_experiment()
+     #market = experiment.run_simulation()  # Ensure proper recepte market
+     #experiment.analyze_autocorrelation_of_returns(market.prices)
+    experiment.fat_tail_experiment(1000)
     # Analyze autocorrelation of prices
     # experiment.analyze_autocorrelation(market.prices)
     # do we do initial price from 0? here l set it as 1
