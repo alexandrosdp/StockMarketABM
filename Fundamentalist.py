@@ -30,7 +30,7 @@ class Fundamentalist:
             P_v = P[-90:]
         else:
             P_v = P
-        vol = np.std(np.diff(P)) * np.sqrt(252)
+        vol = np.std(np.diff(P_v)) * np.sqrt(252)
         if vol <= self.max_risk:
             self.D.append(self.phi * (self.pstar - P[t]) + self.sigma_f * np.random.randn(1).item())
         else:
