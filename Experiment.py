@@ -11,9 +11,6 @@ import numpy as np
 import statsmodels.api as sm
 from statsmodels.graphics.tsaplots import plot_acf
 from statsmodels.stats.diagnostic import acorr_ljungbox
-import statsmodels.api as sm
-from scipy.stats import kurtosis
-from scipy.stats import norm
 
 
 class Experiment():
@@ -114,7 +111,7 @@ class Experiment():
         plt.tight_layout()
         plt.show()
 
-    def flash_crash_experiment(self):
+    def crash_experiment(self):
 
     
         market = self.run_simulation()
@@ -144,9 +141,18 @@ class Experiment():
 
             end_index = start_index
 
-            while (np.diff(market.prices)[end_index + 1] < 0) and end_index < len(np.diff(market.prices)) - 3:
+            counter = 1
+
+            if end_index == len(np.diff(market.prices)) -1:
+
+                end_index = start_index
+            else:
+
+                while (np.diff(market.prices)[end_index + 1] < 0) and end_index < len(np.diff(market.prices)) - 3:
                 
-                end_index += 1
+                    end_index += 1  
+
+            
             
             drop_lengths.append((start_index, end_index))
 
@@ -159,24 +165,51 @@ class Experiment():
         if np.max(market.prices[end_index + 1: np.maximum(end_index+1+period, len(market.prices)-1)]) - market.prices[end_index+1] > np.sum(np.diff(market.prices)[start_index:end_index+1]) * 0.5 and np.sum(np.diff(market.prices)[start_index:end_index+1]) < - 0.03:
                 print("Flash Crash Detected at time: ", index)
                 crash_indices.append((start_index, end_index))
+        
+        drop_magnitude_list = []
+        
 
-        print("Biggest Drop: ", drop_magnitude)
-        plt.figure()
-        plt.plot(np.exp(market.prices))
-        plt.scatter(biggest_drop[0], np.exp(market.prices)[biggest_drop[0]], color='red', label='Flash Crash start')
-        plt.scatter(biggest_drop[1]+1, np.exp(market.prices)[biggest_drop[1]+1], color='red', label='Flash Crash start')
-        plt.xlabel('Time')
-        plt.ylabel('Price')
-        plt.title('Discrete Choice Approach: Flash Crash Detection')
-        plt.show()
+        
+        if drop_magnitude <= -0.07:
+            return 1, drop_magnitude    
+        else:
+            return 0, drop_magnitude
 
-        rr = np.array(market.prices[1:self.time_steps+1]) - np.array(market.prices[0:self.time_steps])
-        plt.figure()
-        plt.plot(range(self.time_steps), rr)
-        plt.xlabel('Time')
-        plt.ylabel('Returns')
-        plt.title('Discrete Choice Approach:Wealth')
-        plt.show()
+
+        # print("Biggest Drop: ", drop_magnitude)
+        # plt.figure()
+        # plt.plot(np.exp(market.prices))
+        # plt.scatter(biggest_drop[0], np.exp(market.prices)[biggest_drop[0]], color='red', label='Flash Crash start')
+        # plt.scatter(biggest_drop[1]+1, np.exp(market.prices)[biggest_drop[1]+1], color='red', label='Flash Crash start')
+        # plt.xlabel('Time')
+        # plt.ylabel('Price')
+        # plt.title('Discrete Choice Approach: Flash Crash Detection')
+        # plt.show()
+
+        # rr = np.array(market.prices[1:self.time_steps+1]) - np.array(market.prices[0:self.time_steps])
+        # plt.figure()
+        # plt.plot(range(self.time_steps), rr)
+        # plt.xlabel('Time')
+        # plt.ylabel('Returns')
+        # plt.title('Discrete Choice Approach:Wealth')
+        # plt.show()
+
+
+    def multiple_runs_crash(self,n_runs):
+
+        """Running the crash experiment multiple times"""
+
+
+        crash_count = 0
+        drop_magintude_list = []
+
+        for i in range(n_runs):
+
+            crash, drop_magintude = self.crash_experiment() #Crash returns either 0  or 1
+            crash_count += crash
+            drop_magintude_list.append(drop_magintude)
+
+        return crash_count, drop_magintude_list
 
 
     def fat_tail_experiment(self, T):
@@ -210,22 +243,24 @@ class Experiment():
         
 
 
+
+
+
 if __name__ == "__main__":
 
-     
-    experiment = Experiment(initial_price=0, 
-                            time_steps=1000,
+     experiment = Experiment(initial_price=0, 
+                            time_steps=500,
                             network_type="barabasi",
-                            number_of_traders=200,
+                            number_of_traders=150,
                             percent_fund=0.50,
                             percent_chartist=0.50,
-                            percent_rational=0.2,
-                            percent_risky=0.2,
-                            high_lookback=5,
+                            percent_rational=0.50,
+                            percent_risky=0.050,
+                            high_lookback=10,
                             low_lookback=1,
-                            high_risk=0.25,
-                            low_risk=0.1,
-                            new_node_edges=6,
+                            high_risk=0.50,
+                            low_risk=0.10,
+                            new_node_edges=5,
                             connection_probability=0.50,
                             mu=0.01,
                             beta=1,
@@ -233,10 +268,9 @@ if __name__ == "__main__":
                             alpha_O=2.1,
                             alpha_p=0
                             )
-     #experiment.flash_crash_experiment()
-     #market = experiment.run_simulation()  # Ensure proper recepte market
-     #experiment.analyze_autocorrelation_of_returns(market.prices)
-    experiment.fat_tail_experiment(1000)
+     experiment.flash_crash_experiment()
+     market = experiment.run_simulation()  # Ensure proper recepte market
+     experiment.analyze_autocorrelation_of_returns(market.prices)
     # Analyze autocorrelation of prices
     # experiment.analyze_autocorrelation(market.prices)
     # do we do initial price from 0? here l set it as 1
