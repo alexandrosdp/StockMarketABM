@@ -11,6 +11,9 @@ import numpy as np
 import statsmodels.api as sm
 from statsmodels.graphics.tsaplots import plot_acf
 from statsmodels.stats.diagnostic import acorr_ljungbox
+from scipy.stats import kurtosis
+from scipy.stats import norm
+from tqdm import tqdm
 
 
 class Experiment():
@@ -238,7 +241,6 @@ class Experiment():
         plt.show() """
         # Calculate kurtosis (K value)
         kurtosis_value = kurtosis(rr.flatten())
-        print(f"Sample kurtosis (K value): {kurtosis_value}")
         return kurtosis_value
         
 
@@ -248,7 +250,7 @@ class Experiment():
 
 if __name__ == "__main__":
 
-     experiment = Experiment(initial_price=0, 
+    experiment = Experiment(initial_price=0, 
                             time_steps=500,
                             network_type="barabasi",
                             number_of_traders=150,
@@ -268,9 +270,21 @@ if __name__ == "__main__":
                             alpha_O=2.1,
                             alpha_p=0
                             )
-     experiment.flash_crash_experiment()
-     market = experiment.run_simulation()  # Ensure proper recepte market
-     experiment.analyze_autocorrelation_of_returns(market.prices)
+    #experiment.crash_experiment()
+    """
+    #Experiment to plot Distribution of Kurtosis
+    ks = []
+    for i in tqdm(range(500)):
+        ks.append(experiment.fat_tail_experiment(500))
+    plt.hist(ks,bins = 50, density=True, alpha=0.8, color='b', edgecolor='black', linewidth=1.2)
+    plt.title('Kurtosis Distribution')
+    plt.xlabel('Kurtosis')
+    plt.ylabel('Frequency')
+    plt.savefig('kurtosis_distribution.svg')
+    plt.show()
+     """
+    #market = experiment.run_simulation()  # Ensure proper recepte market
+    #experiment.analyze_autocorrelation_of_returns(market.prices)
     # Analyze autocorrelation of prices
     # experiment.analyze_autocorrelation(market.prices)
     # do we do initial price from 0? here l set it as 1

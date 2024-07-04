@@ -32,8 +32,6 @@ class Network():
 
 
     def create_network(self):
-        
-        print("Creating network", self.network_type)
 
         if self.network_type == "barabasi":
                 
