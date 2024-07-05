@@ -72,7 +72,7 @@ class Experiment():
 
     def analyze_autocorrelation_of_returns(self, prices):    
         returns = np.diff(prices)
-
+        '''
         # plot（ACF）
         plot_acf(returns, lags=40)
         plt.title('Autocorrelation Function (ACF) of Returns')
@@ -84,7 +84,7 @@ class Experiment():
         ljung_box_result = acorr_ljungbox(returns, lags=[20], return_df=True)
         print("Ljung-Box Test Results:")
         print(ljung_box_result)
-
+        '''
 
     def analyze_volatility_clustering(self):
         prices = self.run_simulation().prices
@@ -92,10 +92,10 @@ class Experiment():
         # Calculate log returns.
         returns = np.log(prices[1:]) - np.log(prices[:-1])
         squared_returns = returns ** 2
-
+        '''
         # Create a figure to house both subplots.
         plt.figure(figsize=(12, 6))
-
+        
         # for squared returns
         plt.subplot(1, 2, 1)
         plt.plot(squared_returns, label='Squared Returns')
@@ -113,7 +113,7 @@ class Experiment():
 
         plt.tight_layout()
         plt.show()
-
+        '''
     def crash_experiment(self):
 
     
@@ -283,6 +283,20 @@ if __name__ == "__main__":
     plt.savefig('kurtosis_distribution.svg')
     plt.show()
      """
+    
+    
+    # Experiment to plot Distribution of Volatility Clustering
+    volatilities = []
+    for i in tqdm(range(500)):
+        volatilities.append(experiment.fat_tail_experiment(500))
+    
+    plt.hist(volatilities, bins=50, density=True, alpha=0.8, color='g', edgecolor='black', linewidth=1.2)
+    plt.title('Volatility Clustering Distribution')
+    plt.xlabel('Average Squared Returns')
+    plt.ylabel('Frequency')
+    plt.savefig('volatility_clustering_distribution.svg')
+    plt.show()
+    
     #market = experiment.run_simulation()  # Ensure proper recepte market
     #experiment.analyze_autocorrelation_of_returns(market.prices)
     # Analyze autocorrelation of prices
