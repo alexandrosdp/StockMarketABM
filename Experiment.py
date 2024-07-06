@@ -271,18 +271,18 @@ if __name__ == "__main__":
     plt.show()
      """
 
-    # Experiment to plot Distribution of Volatility Clustering
-    volatilities = []
-    for i in tqdm(range(500)):
-        volatilities.append(experiment.fat_tail_experiment(500))
+    # # Experiment to plot Distribution of Volatility Clustering
+    # volatilities = []
+    # for i in tqdm(range(500)):
+    #     volatilities.append(experiment.fat_tail_experiment(500))
 
-    plt.hist(volatilities, bins=50, density=True, alpha=0.8,
-             color='g', edgecolor='black', linewidth=1.2)
-    plt.title('Volatility Clustering Distribution')
-    plt.xlabel('Average Squared Returns')
-    plt.ylabel('Frequency')
-    plt.savefig('volatility_clustering_distribution.svg')
-    plt.show()
+    # plt.hist(volatilities, bins=50, density=True, alpha=0.8,
+    #          color='g', edgecolor='black', linewidth=1.2)
+    # plt.title('Volatility Clustering Distribution')
+    # plt.xlabel('Average Squared Returns')
+    # plt.ylabel('Frequency')
+    # plt.savefig('volatility_clustering_distribution.svg')
+    # plt.show()
 
     # Experiment to plot Distribution of Flash Crashes
     # Run the crash experiment 500 times and collect the results
