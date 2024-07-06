@@ -63,14 +63,14 @@ class Experiment():
             # Update price
             market.update_price(t)
 
-            #progress_bar(t / self.time_steps)
+            # progress_bar(t / self.time_steps)
 
         clear_progress_bar()
 
         # network.display_network()
         return market
 
-    def analyze_autocorrelation_of_returns(self, prices):    
+    def analyze_autocorrelation_of_returns(self, prices):
         returns = np.diff(prices)
         '''
         # plot（ACF）
@@ -114,9 +114,9 @@ class Experiment():
         plt.tight_layout()
         plt.show()
         '''
+
     def crash_experiment(self):
 
-    
         market = self.run_simulation()
 
         "TODO: Add logic to check for flash crash"
@@ -124,7 +124,7 @@ class Experiment():
         crash_indices = []
 
         period = 30
-        
+
         drop_magnitude = 0
 
         biggest_drop = None
@@ -146,38 +146,33 @@ class Experiment():
 
             counter = 1
 
-            if end_index == len(np.diff(market.prices)) -1:
+            if end_index == len(np.diff(market.prices)) - 1:
 
                 end_index = start_index
             else:
 
                 while (np.diff(market.prices)[end_index + 1] < 0) and end_index < len(np.diff(market.prices)) - 3:
-                
-                    end_index += 1  
 
-            
-            
+                    end_index += 1
+
             drop_lengths.append((start_index, end_index))
 
-
             # calculate drop magnitude
-            if  np.sum(np.diff(market.prices)[start_index:end_index+1]) < drop_magnitude:
-                drop_magnitude = np.sum(np.diff(market.prices)[start_index:end_index+1])
+            if np.sum(np.diff(market.prices)[start_index:end_index+1]) < drop_magnitude:
+                drop_magnitude = np.sum(np.diff(market.prices)[
+                                        start_index:end_index+1])
                 biggest_drop = (start_index, end_index)
 
         if np.max(market.prices[end_index + 1: np.maximum(end_index+1+period, len(market.prices)-1)]) - market.prices[end_index+1] > np.sum(np.diff(market.prices)[start_index:end_index+1]) * 0.5 and np.sum(np.diff(market.prices)[start_index:end_index+1]) < - 0.03:
-                print("Flash Crash Detected at time: ", index)
-                crash_indices.append((start_index, end_index))
-        
-        drop_magnitude_list = []
-        
+            print("Flash Crash Detected at time: ", index)
+            crash_indices.append((start_index, end_index))
 
-        
+        drop_magnitude_list = []
+
         if drop_magnitude <= -0.07:
-            return 1, drop_magnitude    
+            return 1, drop_magnitude
         else:
             return 0, drop_magnitude
-
 
         # print("Biggest Drop: ", drop_magnitude)
         # plt.figure()
@@ -197,23 +192,19 @@ class Experiment():
         # plt.title('Discrete Choice Approach:Wealth')
         # plt.show()
 
-
-    def multiple_runs_crash(self,n_runs):
-
+    def multiple_runs_crash(self, n_runs):
         """Running the crash experiment multiple times"""
-
 
         crash_count = 0
         drop_magintude_list = []
 
         for i in range(n_runs):
 
-            crash, drop_magintude = self.crash_experiment() #Crash returns either 0  or 1
+            crash, drop_magintude = self.crash_experiment()  # Crash returns either 0  or 1
             crash_count += crash
             drop_magintude_list.append(drop_magintude)
 
         return crash_count, drop_magintude_list
-
 
     def fat_tail_experiment(self, T):
 
@@ -242,15 +233,11 @@ class Experiment():
         # Calculate kurtosis (K value)
         kurtosis_value = kurtosis(rr.flatten())
         return kurtosis_value
-        
-
-
-
 
 
 if __name__ == "__main__":
 
-    experiment = Experiment(initial_price=0, 
+    experiment = Experiment(initial_price=0,
                             time_steps=500,
                             network_type="barabasi",
                             number_of_traders=150,
@@ -270,7 +257,7 @@ if __name__ == "__main__":
                             alpha_O=2.1,
                             alpha_p=0
                             )
-    #experiment.crash_experiment()
+    # experiment.crash_experiment()
     """
     #Experiment to plot Distribution of Kurtosis
     ks = []
@@ -283,22 +270,51 @@ if __name__ == "__main__":
     plt.savefig('kurtosis_distribution.svg')
     plt.show()
      """
-    
-    
+
     # Experiment to plot Distribution of Volatility Clustering
     volatilities = []
     for i in tqdm(range(500)):
         volatilities.append(experiment.fat_tail_experiment(500))
-    
-    plt.hist(volatilities, bins=50, density=True, alpha=0.8, color='g', edgecolor='black', linewidth=1.2)
+
+    plt.hist(volatilities, bins=50, density=True, alpha=0.8,
+             color='g', edgecolor='black', linewidth=1.2)
     plt.title('Volatility Clustering Distribution')
     plt.xlabel('Average Squared Returns')
     plt.ylabel('Frequency')
     plt.savefig('volatility_clustering_distribution.svg')
     plt.show()
-    
-    #market = experiment.run_simulation()  # Ensure proper recepte market
-    #experiment.analyze_autocorrelation_of_returns(market.prices)
+
+    # Experiment to plot Distribution of Flash Crashes
+    # Run the crash experiment 500 times and collect the results
+    crash_counts = []
+    drop_magnitude_list = []
+
+    for _ in tqdm(range(500)):
+        crash_count, drop_magnitude = experiment.multiple_runs_crash(1)
+        crash_counts.append(crash_count)
+        drop_magnitude_list.extend(drop_magnitude)
+        print("Crash Count: ", crash_counts.count(1))
+
+    # Plot the distribution of crash counts
+    plt.figure(figsize=(12, 6))
+    plt.hist(crash_counts, bins=50, density=True, alpha=0.8,
+             color='b', edgecolor='black', linewidth=1.2)
+    plt.title('Distribution of Crash Counts')
+    plt.xlabel('Crash Count')
+    plt.ylabel('Frequency')
+    plt.show()
+
+    # Plot the distribution of drop magnitudes
+    plt.figure(figsize=(12, 6))
+    plt.hist(drop_magnitude_list, bins=50, density=True, alpha=0.8,
+             color='b', edgecolor='black', linewidth=1.2)
+    plt.title('Distribution of Drop Magnitudes')
+    plt.xlabel('Drop Magnitude')
+    plt.ylabel('Frequency')
+    plt.show()
+
+    # market = experiment.run_simulation()  # Ensure proper recepte market
+    # experiment.analyze_autocorrelation_of_returns(market.prices)
     # Analyze autocorrelation of prices
     # experiment.analyze_autocorrelation(market.prices)
     # do we do initial price from 0? here l set it as 1
