@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import statsmodels.api as sm
 from Experiment import Experiment
+import numpy as np
 
 # Set up the Streamlit interface
 st.title('Stock Price Simulation Experiment')
@@ -60,23 +61,20 @@ if st.sidebar.button('Run Simulation'):
     st.subheader('Simulated Stock Prices')
     st.line_chart(df.set_index('Day'))
 
-    # Show statistics
-    st.subheader('Statistics')
-    st.write(df.describe())
-
-    # Plot histogram
-    st.subheader('Price Distribution')
-    fig, ax = plt.subplots()
-    ax.hist(prices, bins=20, edgecolor='black')
-    st.pyplot(fig)
+    
+    # Fat Tail Experiment
+    st.subheader('Fat Tail Experiment')
+    kurtosis_value = experiment.fat_tail_experiment(time_steps, prices, True)
+    st.write(f"Kurtosis Value: {kurtosis_value}")
 
     # Volatility Clustering Analysis
     st.subheader('Volatility Clustering Analysis')
-    experiment.analyze_volatility_clustering()
+    experiment.analyze_volatility_clustering(prices)
 
     # Autocorrelation of Returns Analysis
     st.subheader('Autocorrelation of Returns Analysis')
-    experiment.analyze_autocorrelation_of_returns(prices)
+    p_value = experiment.analyze_autocorrelation_of_returns(prices)
+    st.write(f"p value: {p_value}")
 
     # Crash Experiment
     st.subheader('Crash Experiment')
@@ -84,10 +82,7 @@ if st.sidebar.button('Run Simulation'):
     st.write(f"Number of Crashes Detected: {crash}")
     st.write(f"Drop Magnitude: {drop_magnitude}")
 
-    # Fat Tail Experiment
-    st.subheader('Fat Tail Experiment')
-    kurtosis_value = experiment.fat_tail_experiment(time_steps, prices, True)
-    st.write(f"Kurtosis Value: {kurtosis_value}")
+    
 
 # Instructions
 st.write("""

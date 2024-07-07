@@ -72,48 +72,26 @@ class Experiment():
 
     def analyze_autocorrelation_of_returns(self, prices):
         returns = np.diff(prices)
-        '''
-        # plot（ACF）
+        # Ljung-Box test
+        ljung_box_result = acorr_ljungbox(returns, lags=[20], return_df=True)
+        
+        plt.figure()
         plot_acf(returns, lags=40)
         plt.title('Autocorrelation Function (ACF) of Returns')
         plt.xlabel('Lags')
         plt.ylabel('Autocorrelation')
-        plt.show()
+        st.pyplot(plt.gcf())  # Display the figure in Streamlit
+        #plt.show()
+        
+        return ljung_box_result
 
-        # Ljung-Box test
-        ljung_box_result = acorr_ljungbox(returns, lags=[20], return_df=True)
-        print("Ljung-Box Test Results:")
-        print(ljung_box_result)
-        '''
-
-    def analyze_volatility_clustering(self):
-        prices = self.run_simulation().prices
+    def analyze_volatility_clustering(self, prices):
 
         # Calculate log returns.
-        returns = np.log(prices[1:]) - np.log(prices[:-1])
+        returns = np.array(prices[1:self.time_steps+1]) - np.array(prices[0:self.time_steps])
         squared_returns = returns ** 2
-        '''
-        # Create a figure to house both subplots.
-        plt.figure(figsize=(12, 6))
         
-        # for squared returns
-        plt.subplot(1, 2, 1)
-        plt.plot(squared_returns, label='Squared Returns')
-        plt.title('Squared Returns Over Time')
-        plt.xlabel('Time')
-        plt.ylabel('Squared Returns')
-        plt.legend()
-
-        # for the ACF of squared returns
-        plt.subplot(1, 2, 2)
-        plot_acf(squared_returns, lags=20, alpha=0.05)
-        plt.title('ACF of Squared Returns')
-        plt.xlabel('Lags')
-        plt.ylabel('Autocorrelation')
-
-        plt.tight_layout()
-        plt.show()
-        '''
+        #return squared_returns
 
     def crash_experiment(self):
 
