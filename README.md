@@ -29,6 +29,6 @@ source venv/bin/activate  # On Windows use `venv\Scripts\activate`
 
 pip install -r requirements.txt
 
-To run the interactive Streamlit application, use the following command:
+### To run the interactive Streamlit application, use the following command:
 streamlit run streamlit_app.py
 
