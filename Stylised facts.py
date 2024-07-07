@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 from Experiment import Experiment
 from tqdm import tqdm
 
-import numpy as np
 
 # Define a function for your model
 def run_experiment(params):

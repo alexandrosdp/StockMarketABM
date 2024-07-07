@@ -34,8 +34,8 @@ def model(params_chunk):
             alpha_O=2.1,
             alpha_p=0
         )
-
-        results.append(exp.fat_tail_experiment(500))
+        market = exp.run_simulation()
+        results.append(exp.fat_tail_experiment(500, market.prices))
     return results
 
 problem = {
@@ -55,11 +55,11 @@ problem = {
 }
 
 # Generate samples
-N = 500
+N = 100
 param_values = latin.sample(problem, N)
 
 # Parallel model evaluation with progress tracking
-def parallel_model_evaluation(param_values, num_workers=4):
+def parallel_model_evaluation(param_values, num_workers=8):
     chunks = np.array_split(param_values, num_workers)
     with mp.Pool(num_workers) as pool:
         results = list(tqdm(pool.imap(model, chunks), total=num_workers))

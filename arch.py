@@ -58,7 +58,7 @@ problem = {
 }
 
 # Generate samples
-N = 500
+N = 100
 param_values = latin.sample(problem, N)
 
 def parallel_model_evaluation(param_values, num_workers=4):

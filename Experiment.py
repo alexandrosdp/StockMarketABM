@@ -97,8 +97,6 @@ class Experiment():
 
         market = self.run_simulation()
 
-        "TODO: Add logic to check for flash crash"
-
         crash_indices = []
 
         period = 30
