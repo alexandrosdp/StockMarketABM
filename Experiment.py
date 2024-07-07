@@ -2,7 +2,7 @@
 """
 A Class to conduct experiments with the simulation
 """
-
+import streamlit as st
 from Network import Network
 from simulate_network import Market
 from utils import progress_bar, clear_progress_bar
@@ -206,30 +206,26 @@ class Experiment():
 
         return crash_count, drop_magintude_list
 
-    def fat_tail_experiment(self, T):
-
-        market = self.run_simulation()
-
-        "TODO: Add logic to check for flat tails"
-        rr = np.array(market.prices[1:T+1]) - np.array(market.prices[0:T])
-        """ plt.figure()
-        plt.plot(np.exp(market.prices))
-        plt.xlabel('Time')
-        plt.ylabel('Price')
-        #plt.title('Discrete Choice Approach: Wealth')
-        plt.show()
-        sm.qqplot(rr.flatten(), line='s')  # 's' line fit standardizes the data to have the same scale
-        plt.title('QQ Plot')
-        plt.show()
-        plt.hist(rr.flatten(), bins = 50, density=True, alpha=0.8, color='b', edgecolor='black', linewidth=1.2) """
-    # Fit a normal distribution to the data
-        mu, std = norm.fit(rr.flatten())
-        xmin, xmax = plt.xlim()
-        x = np.linspace(xmin, xmax, 100)
-        p = norm.pdf(x, mu, std)
-        # Plot normal distribution curve
-        """ plt.plot(x, p, 'k', linewidth=2)
-        plt.show() """
+    def fat_tail_experiment(self, T, prices,  plot=False):
+        rr = np.array(prices[1:T+1]) - np.array(prices[0:T])
+        if plot:
+            plt.figure()
+            sm.qqplot(rr.flatten(), line='s')  # 's' line fit standardizes the data to have the same scale
+            plt.title('QQ Plot')
+            plt.xlabel('Returns')
+            plt.ylabel('Frequency')
+            st.pyplot(plt.gcf())  # Display the figure in Streamlit
+            plt.figure()
+            plt.hist(rr.flatten(), bins = 50, density=True, alpha=0.8, color='b', edgecolor='black', linewidth=1.2)
+            # Fit a normal distribution to the data
+            mu, std = norm.fit(rr.flatten())
+            xmin, xmax = plt.xlim()
+            # Plot normal distribution curve
+            x = np.linspace(xmin, xmax, 100)
+            p = norm.pdf(x, mu, std)
+            plt.plot(x, p, 'k', linewidth=2)
+            st.pyplot(plt.gcf())  # Display the figure in Streamlit
+            #plt.show()
         # Calculate kurtosis (K value)
         kurtosis_value = kurtosis(rr.flatten())
         return kurtosis_value
@@ -289,29 +285,29 @@ if __name__ == "__main__":
     crash_counts = []
     drop_magnitude_list = []
 
-    for _ in tqdm(range(500)):
+    """ for _ in tqdm(range(500)):
         crash_count, drop_magnitude = experiment.multiple_runs_crash(1)
         crash_counts.append(crash_count)
         drop_magnitude_list.extend(drop_magnitude)
-        print("Crash Count: ", crash_counts.count(1))
+        print("Crash Count: ", crash_counts.count(1)) """
 
     # Plot the distribution of crash counts
-    plt.figure(figsize=(12, 6))
+    """ plt.figure(figsize=(12, 6))
     plt.hist(crash_counts, bins=50, density=True, alpha=0.8,
              color='b', edgecolor='black', linewidth=1.2)
     plt.title('Distribution of Crash Counts')
     plt.xlabel('Crash Count')
     plt.ylabel('Frequency')
-    plt.show()
+    plt.show() """
 
     # Plot the distribution of drop magnitudes
-    plt.figure(figsize=(12, 6))
+    """ plt.figure(figsize=(12, 6))
     plt.hist(drop_magnitude_list, bins=50, density=True, alpha=0.8,
              color='b', edgecolor='black', linewidth=1.2)
     plt.title('Distribution of Drop Magnitudes')
     plt.xlabel('Drop Magnitude')
     plt.ylabel('Frequency')
-    plt.show()
+    plt.show() """
 
     # market = experiment.run_simulation()  # Ensure proper recepte market
     # experiment.analyze_autocorrelation_of_returns(market.prices)
