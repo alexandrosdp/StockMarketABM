@@ -17,7 +17,7 @@ This repository contains a stock price simulation model using agent-based modeli
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/my_stock_simulation.git
+   git clone https://github.com/alexdupreez1/StockMarketABM.git
    cd my_stock_simulation
 
 ### Create A Virtual Environment
