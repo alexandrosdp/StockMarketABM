@@ -38,7 +38,9 @@ def model(params_chunk):
             alpha_p=0
         )
 
-        crash_count, _ = exp.multiple_runs_crash(1)
+        # Run the experiment multiple times and count crashes
+        # Change 100 to your desired number of runs
+        crash_count, _ = exp.multiple_runs_crash(100)
         results.append(crash_count)
     return results
 
@@ -101,7 +103,7 @@ if __name__ == '__main__':
     axes[1].set_title(
         'PAWN Sensitivity Analysis (Median)- frequency of crashes')
 
-    # Enhance the overall aesthetics
+    # The overall layout
     for ax in axes:
         ax.grid(True)
         ax.set_axisbelow(True)
