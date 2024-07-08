@@ -5,17 +5,18 @@ import matplotlib.pyplot as plt
 import multiprocessing as mp
 from tqdm import tqdm
 from Experiment import *
-from utils import progress_bar, clear_progress_bar
 
-def model(params_chunk, progress_queue, total_tasks):
+
+
+def model(params_chunk):
     results = []
-    for i, params in enumerate(params_chunk):
+    for params in params_chunk:
         number_of_traders = int(params[0])
         if number_of_traders % 2 != 0:
             number_of_traders += 1  # Increment to make even if odd
 
         exp = Experiment(
-            initial_price=0,
+            initial_price=1,  # Ensure initial_price is more than 0 to avoid log(0) issues
             time_steps=500,
             network_type='barabasi',
             number_of_traders=number_of_traders,
@@ -35,10 +36,9 @@ def model(params_chunk, progress_queue, total_tasks):
             alpha_O=2.1,
             alpha_p=0
         )
-
-        results.append(exp.fat_tail_experiment(500))
-        progress_queue.put(1)  # Report progress
-
+        market = exp.run_simulation()
+        vol_cluster = exp.analyze_volatility_clustering(market.prices)
+        results.append(vol_cluster)
     return results
 
 problem = {
@@ -61,25 +61,15 @@ problem = {
 N = 100
 param_values = latin.sample(problem, N)
 
-def parallel_model_evaluation(param_values, num_workers=4):
+# Parallel model evaluation with progress tracking
+def parallel_model_evaluation(param_values, num_workers=8):
     chunks = np.array_split(param_values, num_workers)
-    total_tasks = len(param_values)
-    
-    progress_queue = mp.Queue()
-    
-    def worker_wrapper(args):
-        return model(*args)
-
-    pool_args = [(chunk, progress_queue, total_tasks) for chunk in chunks]
-    
     with mp.Pool(num_workers) as pool:
-        results = []
-        for result in tqdm(pool.imap(worker_wrapper, pool_args), total=num_workers):
-            results.extend(result)
-
+        results = list(tqdm(pool.imap(model, chunks), total=num_workers))
     return np.concatenate(results)
 
 if __name__ == '__main__':
+    # Number of workers for parallel processing
     num_workers = mp.cpu_count()
 
     # Run the model in parallel

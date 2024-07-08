@@ -90,8 +90,9 @@ class Experiment():
         # Calculate log returns.
         returns = np.array(prices[1:self.time_steps+1]) - np.array(prices[0:self.time_steps])
         squared_returns = returns ** 2
+        average_squared_returns = np.mean(squared_returns)
         
-        #return squared_returns
+        # return squared_returns
 
     def crash_experiment(self):
 
