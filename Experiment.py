@@ -92,6 +92,8 @@ class Experiment():
         squared_returns = returns ** 2
         average_squared_returns = np.mean(squared_returns)
         
+        return average_squared_returns
+        
         # return squared_returns
 
     def crash_experiment(self):

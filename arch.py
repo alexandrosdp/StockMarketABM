@@ -6,8 +6,6 @@ import multiprocessing as mp
 from tqdm import tqdm
 from Experiment import *
 
-
-
 def model(params_chunk):
     results = []
     for params in params_chunk:
@@ -75,33 +73,49 @@ if __name__ == '__main__':
     # Run the model in parallel
     Y = parallel_model_evaluation(param_values, num_workers)
 
-    # Perform sensitivity analysis using PAWN method
-    k = 15  # Number of bins
-    S = pawn.analyze(problem, param_values, Y, k)
+    # Print the length and a sample of Y to debug
+    print(f"Length of Y: {len(Y)}")
+    if len(Y) > 0:
+        print(f"Sample of Y: {Y[:5]}")
 
-    # Plot results
-    fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(10, 8), sharex=True)
+    # Ensure all elements in Y are numbers
+    Y = np.array([y for y in Y if isinstance(y, (int, float, np.number))])
 
-    # Plot mean sensitivity indices
-    axes[0].bar(problem['names'], S['mean'], align='center', color='skyblue', edgecolor='black')
-    axes[0].set_ylabel('Sensitivity Index (mean)')
-    axes[0].set_title('PAWN Sensitivity Analysis (Mean)')
+    # Print all contents of Y to debug
+    for i, y in enumerate(Y):
+        print(f"Y[{i}] = {y}, type = {type(y)}")
 
-    # Plot median sensitivity indices
-    axes[1].bar(problem['names'], S['median'], align='center', color='salmon', edgecolor='black')
-    axes[1].set_xlabel('Parameter')
-    axes[1].set_ylabel('Sensitivity Index (median)')
-    axes[1].set_title('PAWN Sensitivity Analysis (Median)')
+    # Check if Y is empty
+    if Y.size == 0:
+        print("Error: Y is empty. Ensure that the model function returns valid results.")
+    else:
+        # Perform sensitivity analysis using PAWN method
+        k = 15  # Number of bins
+        S = pawn.analyze(problem, param_values, Y, k)
 
-    # Enhance the overall aesthetics
-    for ax in axes:
-        ax.grid(True)
-        ax.set_axisbelow(True)
-        ax.spines['top'].set_visible(False)
-        ax.spines['right'].set_visible(False)
-        ax.yaxis.grid(True, color='gray', linestyle='--', linewidth=0.5)
-        ax.xaxis.grid(False)
+        # Plot results
+        fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(10, 8), sharex=True)
 
-    plt.tight_layout()
-    plt.savefig('pawn_sensitivity_analysis.svg')
-    plt.show()
+        # Plot mean sensitivity indices
+        axes[0].bar(problem['names'], S['mean'], align='center', color='skyblue', edgecolor='black')
+        axes[0].set_ylabel('Sensitivity Index (mean)')
+        axes[0].set_title('PAWN Sensitivity Analysis (Mean)')
+
+        # Plot median sensitivity indices
+        axes[1].bar(problem['names'], S['median'], align='center', color='salmon', edgecolor='black')
+        axes[1].set_xlabel('Parameter')
+        axes[1].set_ylabel('Sensitivity Index (median)')
+        axes[1].set_title('PAWN Sensitivity Analysis (Median)')
+
+        # Enhance the overall aesthetics
+        for ax in axes:
+            ax.grid(True)
+            ax.set_axisbelow(True)
+            ax.spines['top'].set_visible(False)
+            ax.spines['right'].set_visible(False)
+            ax.yaxis.grid(True, color='gray', linestyle='--', linewidth=0.5)
+            ax.xaxis.grid(False)
+
+        plt.tight_layout()
+        plt.savefig('pawn_sensitivity_analysis.svg')
+        plt.show()
