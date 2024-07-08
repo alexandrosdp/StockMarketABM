@@ -4,7 +4,8 @@ from SALib.analyze import pawn
 import matplotlib.pyplot as plt
 import multiprocessing as mp
 from tqdm import tqdm
-from Experiment import *
+from Experiment import Experiment
+
 
 def model(params_chunk):
     results = []
@@ -35,8 +36,10 @@ def model(params_chunk):
             alpha_p=0
         )
 
-        results.append(exp.fat_tail_experiment(500))
+        crash_count, _ = exp.multiple_runs_crash(1)
+        results.append(crash_count)
     return results
+
 
 problem = {
     'num_vars': 6,
@@ -59,11 +62,14 @@ N = 500
 param_values = latin.sample(problem, N)
 
 # Parallel model evaluation with progress tracking
+
+
 def parallel_model_evaluation(param_values, num_workers=4):
     chunks = np.array_split(param_values, num_workers)
     with mp.Pool(num_workers) as pool:
         results = list(tqdm(pool.imap(model, chunks), total=num_workers))
     return np.concatenate(results)
+
 
 if __name__ == '__main__':
     # Number of workers for parallel processing
@@ -80,12 +86,14 @@ if __name__ == '__main__':
     fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(10, 8), sharex=True)
 
     # Plot mean sensitivity indices
-    axes[0].bar(problem['names'], S['mean'], align='center', color='skyblue', edgecolor='black')
+    axes[0].bar(problem['names'], S['mean'], align='center',
+                color='skyblue', edgecolor='black')
     axes[0].set_ylabel('Sensitivity Index (mean)')
     axes[0].set_title('PAWN Sensitivity Analysis (Mean)')
 
     # Plot median sensitivity indices
-    axes[1].bar(problem['names'], S['median'], align='center', color='salmon', edgecolor='black')
+    axes[1].bar(problem['names'], S['median'], align='center',
+                color='salmon', edgecolor='black')
     axes[1].set_xlabel('Parameter')
     axes[1].set_ylabel('Sensitivity Index (median)')
     axes[1].set_title('PAWN Sensitivity Analysis (Median)')
