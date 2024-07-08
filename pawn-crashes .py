@@ -62,7 +62,7 @@ problem = {
 }
 
 # Generate samples
-N = 500
+N = 1000
 param_values = latin.sample(problem, N)
 
 # Parallel model evaluation with progress tracking
