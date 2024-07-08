@@ -7,6 +7,7 @@ from tqdm import tqdm
 from Experiment import Experiment
 
 # Purpose: to understand the impact of different parameters on the frequency of crashes
+# perform the sensitivity analysis based on the number of crashes in one run per parameter set
 
 
 def model(params_chunk):
@@ -38,9 +39,8 @@ def model(params_chunk):
             alpha_p=0
         )
 
-        # Run the experiment multiple times and count crashes
-        # Change 100 to your desired number of runs
-        crash_count, _ = exp.multiple_runs_crash(100)
+        # Run the experiment once and count crashes
+        crash_count, _ = exp.multiple_runs_crash(1)
         results.append(crash_count)
     return results
 
