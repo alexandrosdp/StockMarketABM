@@ -6,6 +6,8 @@ import multiprocessing as mp
 from tqdm import tqdm
 from Experiment import Experiment
 
+# Purpose: to understand the impact of different parameters on the frequency of crashes
+
 
 def model(params_chunk):
     results = []
@@ -89,14 +91,15 @@ if __name__ == '__main__':
     axes[0].bar(problem['names'], S['mean'], align='center',
                 color='skyblue', edgecolor='black')
     axes[0].set_ylabel('Sensitivity Index (mean)')
-    axes[0].set_title('PAWN Sensitivity Analysis (Mean)')
+    axes[0].set_title('PAWN Sensitivity Analysis (Mean)- frequency of crashes')
 
     # Plot median sensitivity indices
     axes[1].bar(problem['names'], S['median'], align='center',
                 color='salmon', edgecolor='black')
     axes[1].set_xlabel('Parameter')
     axes[1].set_ylabel('Sensitivity Index (median)')
-    axes[1].set_title('PAWN Sensitivity Analysis (Median)')
+    axes[1].set_title(
+        'PAWN Sensitivity Analysis (Median)- frequency of crashes')
 
     # Enhance the overall aesthetics
     for ax in axes:
@@ -108,5 +111,5 @@ if __name__ == '__main__':
         ax.xaxis.grid(False)
 
     plt.tight_layout()
-    plt.savefig('pawn_sensitivity_analysis.svg')
+    plt.savefig('pawn_sensitivity_analysis- frequency of crashes.svg')
     plt.show()
