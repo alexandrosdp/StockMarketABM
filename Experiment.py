@@ -87,12 +87,17 @@ class Experiment():
 
     def analyze_volatility_clustering(self, prices):
 
-        # Calculate log returns.
-        returns = np.array(prices[1:self.time_steps+1]) - np.array(prices[0:self.time_steps])
-        squared_returns = returns ** 2
-        average_squared_returns = np.mean(squared_returns)
-        
-        return average_squared_returns
+        # Calculate log returns
+        prices = np.exp(np.array(prices))
+        # Convert the numpy array to a pandas Series
+        # Calculate returns
+        returns = prices[1:] - prices[:-1]
+        # ARCH Test For Volatility Clustering
+        arch_test = sm.stats.diagnostic.het_arch(returns.flatten())
+        if arch_test[1] < 0.05:
+            return 1
+        else:
+            return 0
         
         # return squared_returns
 
