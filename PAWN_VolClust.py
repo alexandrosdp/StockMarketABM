@@ -93,10 +93,10 @@ if __name__ == '__main__':
     axes[0].set_title('PAWN Sensitivity Analysis (Mean)')
 
     # Plot median sensitivity indices
-    axes[1].bar(problem['names'], S['median'], align='center', color='salmon', edgecolor='black')
+    axes[1].bar(problem['names'], S['maximum'], align='center', color='salmon', edgecolor='black')
     axes[1].set_xlabel('Parameter')
-    axes[1].set_ylabel('Sensitivity Index (median)')
-    axes[1].set_title('PAWN Sensitivity Analysis (Median)')
+    axes[1].set_ylabel('Sensitivity Index (maximum)')
+    axes[1].set_title('PAWN Sensitivity Analysis (maximum)')
 
     # Enhance the overall aesthetics
     for ax in axes:
