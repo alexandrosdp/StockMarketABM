@@ -95,9 +95,9 @@ class Experiment():
         # ARCH Test For Volatility Clustering
         arch_test = sm.stats.diagnostic.het_arch(returns.flatten())
         if arch_test[1] < 0.05:
-            return 1
+            return 1, arch_test[1]
         else:
-            return 0
+            return 0, arch_test[1]
         
         # return squared_returns
 

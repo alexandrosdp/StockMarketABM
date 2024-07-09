@@ -6,11 +6,12 @@ import multiprocessing as mp
 from tqdm import tqdm
 from Experiment import *
 
+# Define the model function
 def model(params_chunk):
     results = []
     for params in params_chunk:
         number_of_traders = int(params[0])
-        if number_of_traders % 2 != 0:
+        if (number_of_traders % 2) != 0:
             number_of_traders += 1  # Increment to make even if odd
 
         exp = Experiment(
@@ -28,21 +29,24 @@ def model(params_chunk):
             low_risk=0.01,
             new_node_edges=int(params[5]),
             connection_probability=0.5,
-            mu=0.01,
-            beta=1,
-            alpha_w=2668,
-            alpha_O=2.1,
+            mu=params[6],
+            beta=params[7],
+            alpha_w=params[8],
+            alpha_O=params[9],
             alpha_p=0
         )
         market = exp.run_simulation()
-        results.append(exp.fat_tail_experiment(500, market.prices))
+        y2 = exp.fat_tail_experiment(500, market.prices)
+        results.append(y2)
     return results
 
+# Define the problem for sensitivity analysis
 problem = {
-    'num_vars': 6,
+    'num_vars': 10,
     'names': [
         'number_of_traders', 'percent_rational', 'percent_risky',
-        'high_lookback', 'high_risk', 'new_node_edges'
+        'high_lookback', 'high_risk', 'new_node_edges',
+        'mu', 'beta', 'alpha_w', 'alpha_O'
     ],
     'bounds': [
         [50, 200],  # number_of_traders
@@ -50,12 +54,16 @@ problem = {
         [0.05, 1.0],  # percent_risky
         [5, 30],  # high_lookback
         [0.05, 0.20],  # high_risk
-        [2, 10]  # new_node_edges
+        [2, 10],  # new_node_edges
+        [0.001, 0.1],  # mu
+        [0.1, 2.0],  # beta
+        [1000, 5000],  # alpha_w
+        [1.0, 3.0]  # alpha_O
     ]
 }
 
-# Generate samples
-N = 100
+# Generate Latin Hypercube samples
+N = 1000
 param_values = latin.sample(problem, N)
 
 # Parallel model evaluation with progress tracking
@@ -77,7 +85,7 @@ if __name__ == '__main__':
     S = pawn.analyze(problem, param_values, Y, k)
 
     # Plot results
-    fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(10, 8), sharex=True)
+    fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(12, 10), sharex=True)
 
     # Plot mean sensitivity indices
     axes[0].bar(problem['names'], S['mean'], align='center', color='skyblue', edgecolor='black')
@@ -85,10 +93,10 @@ if __name__ == '__main__':
     axes[0].set_title('PAWN Sensitivity Analysis (Mean)')
 
     # Plot median sensitivity indices
-    axes[1].bar(problem['names'], S['median'], align='center', color='salmon', edgecolor='black')
+    axes[1].bar(problem['names'], S['maximum'], align='center', color='salmon', edgecolor='black')
     axes[1].set_xlabel('Parameter')
-    axes[1].set_ylabel('Sensitivity Index (median)')
-    axes[1].set_title('PAWN Sensitivity Analysis (Median)')
+    axes[1].set_ylabel('Sensitivity Index (maximum)')
+    axes[1].set_title('PAWN Sensitivity Analysis (maximum)')
 
     # Enhance the overall aesthetics
     for ax in axes:
@@ -100,5 +108,5 @@ if __name__ == '__main__':
         ax.xaxis.grid(False)
 
     plt.tight_layout()
-    plt.savefig('pawn_sensitivity_analysis.svg')
+    plt.savefig('pawn_SA_K_extended.png')
     plt.show()
