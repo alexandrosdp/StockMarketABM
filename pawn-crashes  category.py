@@ -32,10 +32,10 @@ def model(params_chunk):
             low_risk=0.01,
             new_node_edges=int(params[5]),
             connection_probability=0.5,
-            mu=0.01,
-            beta=1,
-            alpha_w=2668,
-            alpha_O=2.1,
+            mu=params[6],
+            beta=params[7],
+            alpha_w=params[8],
+            alpha_O=params[9],
             alpha_p=0
         )
 
@@ -46,11 +46,13 @@ def model(params_chunk):
     return results
 
 
+# Define the problem for sensitivity analysis
 problem = {
-    'num_vars': 6,
+    'num_vars': 10,
     'names': [
         'number_of_traders', 'percent_rational', 'percent_risky',
-        'high_lookback', 'high_risk', 'new_node_edges'
+        'high_lookback', 'high_risk', 'new_node_edges',
+        'mu', 'beta', 'alpha_w', 'alpha_O'
     ],
     'bounds': [
         [50, 200],  # number_of_traders
@@ -58,9 +60,14 @@ problem = {
         [0.05, 1.0],  # percent_risky
         [5, 30],  # high_lookback
         [0.05, 0.20],  # high_risk
-        [2, 10]  # new_node_edges
+        [2, 10],  # new_node_edges
+        [0.001, 0.1],  # mu
+        [0.1, 2.0],  # beta
+        [1000, 5000],  # alpha_w
+        [1.0, 3.0]  # alpha_O
     ]
 }
+
 
 # Generate samples
 N = 1000
@@ -98,7 +105,7 @@ if __name__ == '__main__':
         'PAWN Sensitivity Analysis (Mean)- probability of crashes')
 
     # Plot median sensitivity indices
-    axes[1].bar(problem['names'], S['median'], align='center',
+    axes[1].bar(problem['names'], S['maximum'], align='center',
                 color='salmon', edgecolor='black')
     axes[1].set_xlabel('Parameter')
     axes[1].set_ylabel('Sensitivity Index (median)')
