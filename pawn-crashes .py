@@ -33,9 +33,9 @@ def model(params_chunk):
             new_node_edges=int(params[5]),
             connection_probability=0.5,
             mu=params[6],
-            beta=params[7],
-            alpha_w=params[8],
-            alpha_O=params[9],
+            beta=1,
+            alpha_w=2668,
+            alpha_O=2.1,
             alpha_p=0
         )
 
@@ -45,11 +45,11 @@ def model(params_chunk):
     return results
 
 problem = {
-    'num_vars': 10,
+    'num_vars': 7,
     'names': [
         'number_of_traders', 'percent_rational', 'percent_risky',
         'high_lookback', 'high_risk', 'new_node_edges',
-        'mu', 'beta', 'alpha_w', 'alpha_O'
+        'mu'
     ],
     'bounds': [
         [50, 200],  # number_of_traders
@@ -59,9 +59,6 @@ problem = {
         [0.05, 0.20],  # high_risk
         [2, 10],  # new_node_edges
         [0.001, 0.1],  # mu
-        [0.1, 2.0],  # beta
-        [1000, 5000],  # alpha_w
-        [1.0, 3.0]  # alpha_O
     ]
 }
 
@@ -117,5 +114,5 @@ if __name__ == '__main__':
         ax.xaxis.grid(False)
 
     plt.tight_layout()
-    plt.savefig('pawn_sensitivity_analysis- frequency of crashes.svg')
+    plt.savefig('pawn_SA_crashes.jpeg')
     plt.show()
