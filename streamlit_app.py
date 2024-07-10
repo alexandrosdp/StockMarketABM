@@ -70,7 +70,7 @@ if st.sidebar.button('Run Simulation'):
 
     # Volatility Clustering Analysis
     st.subheader('Volatility Clustering Analysis')
-    experiment.analyze_volatility_clustering(prices)
+    experiment.analyze_volatility_clustering(prices, True)
 
     # Autocorrelation of Returns Analysis
     st.subheader('Autocorrelation of Returns Analysis')

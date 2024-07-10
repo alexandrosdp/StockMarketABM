@@ -81,29 +81,47 @@ if __name__ == '__main__':
     k = 15  # Number of bins
     S = pawn.analyze(problem, param_values, Y, k)
 
+    # Extract PAWN sensitivity indices
+    pawn_Si_mean = S['mean']
+    pawn_Si_max = S['maximum']
+
+    # Compute the critical value for the KS test
+    alpha = 0.05  # significance level
+    num_samples = len(param_values)
+    critical_value = 1.36 / np.sqrt(num_samples)
+
+    # Verify KS Statistics
+    significant = {}
+    for name, si_max in zip(problem['names'], pawn_Si_max):
+        significant[name] = si_max > critical_value
+
+    # Rank Factors
+    factors = problem['names']
+    # Sort factors by mean sensitivity indices
+    #sorted_mean_ranking = sorted(zip(factors, pawn_Si_mean), key=lambda x: x[1], reverse=True)
+    sorted_max_ranking = sorted(zip(factors, pawn_Si_max), key=lambda x: x[1], reverse=True)
+
+    # Unzip the sorted rankings
+    #sorted_factors_mean, sorted_pawn_Si_mean = zip(*sorted_mean_ranking)
+    sorted_factors_max, sorted_pawn_Si_max = zip(*sorted_max_ranking)
+
     # Plot results
-    fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(12, 10), sharex=True)
+    
 
-    # Plot mean sensitivity indices
-    axes[0].bar(problem['names'], S['mean'], align='center', color='skyblue', edgecolor='black')
-    axes[0].set_ylabel('Sensitivity Index (mean)')
-    axes[0].set_title('PAWN Sensitivity Analysis (Mean)')
-
-    # Plot median sensitivity indices
-    axes[1].bar(problem['names'], S['maximum'], align='center', color='salmon', edgecolor='black')
-    axes[1].set_xlabel('Parameter')
-    axes[1].set_ylabel('Sensitivity Index (maximum)')
-    axes[1].set_title('PAWN Sensitivity Analysis (maximum)')
-
-    # Enhance the overall aesthetics
-    for ax in axes:
-        ax.grid(True)
-        ax.set_axisbelow(True)
-        ax.spines['top'].set_visible(False)
-        ax.spines['right'].set_visible(False)
-        ax.yaxis.grid(True, color='gray', linestyle='--', linewidth=0.5)
-        ax.xaxis.grid(False)
-
+    # Plot maximum sensitivity indices
+    plt.figure(figsize=(12, 8))
+    plt.bar(sorted_factors_max, sorted_pawn_Si_max, align='center', color='salmon', edgecolor='black')
+    plt.axhline(critical_value, color='red', linestyle='--')
+    plt.xlabel('Parameter')
+    plt.ylabel('Sensitivity Index (maximum)')
     plt.tight_layout()
-    plt.savefig('pawn_SA_Vol.png')
+    plt.savefig('pawn_SA_vol_clustering.png')
     plt.show()
+    
+    #plt.figure(figsize=(12, 8))
+    #plt.scatter( , pawn_Si_max, color='skyblue', edgecolor='black')
+
+    # Display significance
+    print("Significance Results:")
+    for name in factors:
+        print(f"{name}: {'Significant' if significant[name] else 'Not Significant'}")

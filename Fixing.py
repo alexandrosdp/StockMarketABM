@@ -4,17 +4,15 @@ from SALib.analyze import pawn
 import matplotlib.pyplot as plt
 import multiprocessing as mp
 from tqdm import tqdm
-from Experiment import Experiment
+from scipy.stats import kstwobign
+from Experiment import *
 
-# Purpose: to understand the impact of different parameters on the frequency of crashes
-# perform the sensitivity analysis based on the number of crashes in one run per parameter set
-
-
+# Define the model function
 def model(params_chunk):
     results = []
     for params in params_chunk:
         number_of_traders = int(params[0])
-        if number_of_traders % 2 != 0:
+        if (number_of_traders % 2) != 0:
             number_of_traders += 1  # Increment to make even if odd
 
         exp = Experiment(
@@ -38,12 +36,12 @@ def model(params_chunk):
             alpha_O=2.1,
             alpha_p=0
         )
-
-        # Run the experiment once and count crashes
-        crash_count, _ = exp.multiple_runs_crash(1)
-        results.append(crash_count)
+        market = exp.run_simulation()
+        y2 = exp.fat_tail_experiment(500, market.prices)
+        results.append(y2)
     return results
 
+# Define the problem for sensitivity analysis
 problem = {
     'num_vars': 7,
     'names': [
@@ -62,19 +60,16 @@ problem = {
     ]
 }
 
-# Generate samples
+# Generate Latin Hypercube samples
 N = 1000
 param_values = latin.sample(problem, N)
 
 # Parallel model evaluation with progress tracking
-
-
-def parallel_model_evaluation(param_values, num_workers=4):
+def parallel_model_evaluation(param_values, num_workers=8):
     chunks = np.array_split(param_values, num_workers)
     with mp.Pool(num_workers) as pool:
         results = list(tqdm(pool.imap(model, chunks), total=num_workers))
     return np.concatenate(results)
-
 
 if __name__ == '__main__':
     # Number of workers for parallel processing
@@ -87,7 +82,7 @@ if __name__ == '__main__':
     k = 15  # Number of bins
     S = pawn.analyze(problem, param_values, Y, k)
 
-    # # Extract PAWN sensitivity indices
+    # Extract PAWN sensitivity indices
     pawn_Si_mean = S['mean']
     pawn_Si_max = S['maximum']
 
@@ -121,7 +116,7 @@ if __name__ == '__main__':
     plt.xlabel('Parameter')
     plt.ylabel('Sensitivity Index (maximum)')
     plt.tight_layout()
-    plt.savefig('pawn_SA_crashes.jpeg')
+    plt.savefig('pawn_SA_K_extended.png')
     plt.show()
     
     #plt.figure(figsize=(12, 8))
