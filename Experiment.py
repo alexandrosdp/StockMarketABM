@@ -267,6 +267,7 @@ if __name__ == "__main__":
     #Experiment to plot Distribution of Kurtosis
     ks = []
     for i in tqdm(range(500)):
+        market = experiment.run_simulation()
         ks.append(experiment.fat_tail_experiment(500))
     plt.hist(ks,bins = 50, density=True, alpha=0.8, color='b', edgecolor='black', linewidth=1.2)
     plt.title('Kurtosis Distribution')
