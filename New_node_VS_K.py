@@ -9,7 +9,7 @@ from tqdm import tqdm
 def run_experiment(params):
     exp = Experiment(
         initial_price=0,
-        time_steps=1000,
+        time_steps=500,
         network_type='barabasi',
         number_of_traders=params['number_of_traders'],
         percent_fund=0.5,
@@ -28,11 +28,12 @@ def run_experiment(params):
         alpha_O=2.1,
         alpha_p=0
     )
-    return exp.fat_tail_experiment(1000)  # Assuming the Experiment class has a run method that returns results
+    market = exp.run_simulation()
+    return exp.fat_tail_experiment(500, market.prices)  # Assuming the Experiment class has a run method that returns results
 
 # Default parameters
 default_params = {
-    'number_of_traders': 100,
+    'number_of_traders': 150,
     'percent_rational': 0.1,
     'percent_risky': 0.1,
     'high_lookback': 15,
@@ -41,19 +42,28 @@ default_params = {
 }
 
 # Parameter to vary - number of traders
-num_traders_range = np.arange(50, 201, 50)  # From 50 to 200 in steps of 10
+new_node_edges = np.arange(1, 10, 1)  # From 50 to 200 in steps of 10
 
 # Record results
 avg_result = []
-for num in tqdm(num_traders_range):
+ci_upper = []
+ci_lower = []
+for num in tqdm(new_node_edges):
     results = []
     for _ in range(30):
         params = default_params.copy()
-        params['number_of_traders'] = num
+        params['new_node_edges'] = num
         result = run_experiment(params)
         results.append(result)
     avg_result.append(np.mean(results))
+    ci_upper.append(np.percentile(results, 97.5))
+    ci_lower.append(np.percentile(results, 2.5))
 
-plt.plot(num_traders_range, avg_result)
-plt.savefig('num_traders_sensitivity.jpeg')
+plt.plot(new_node_edges, avg_result)
+plt.plot(new_node_edges, ci_upper, linestyle='--', color='gray')
+plt.plot(new_node_edges, ci_lower, linestyle='--', color='gray')
+plt.fill_between(new_node_edges, ci_lower, ci_upper, color='gray', alpha=0.5)
+plt.xlabel('New Node Edges')
+plt.ylabel('Fat Tail Experiment')
+plt.savefig('new_node_edge_sensitivity.jpeg')
 plt.show()
