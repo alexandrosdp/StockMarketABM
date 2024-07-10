@@ -29,6 +29,7 @@ high_risk = st.sidebar.slider('High Risk', min_value=0.0, max_value=1.0, value=0
 low_risk = st.sidebar.slider('Low Risk', min_value=0.0, max_value=1.0, value=0.1)
 new_node_edges = st.sidebar.number_input('New Node Edges', min_value=1, max_value=100, value=5)
 connection_probability = st.sidebar.slider('Connection Probability', min_value=0.0, max_value=1.0, value=0.5)
+mu = st.sidebar.number_input('Mu', min_value=0.0, value=0.01)
 
 
 
@@ -48,7 +49,7 @@ experiment = Experiment(
     low_risk=low_risk,
     new_node_edges=new_node_edges,
     connection_probability=connection_probability,
-    mu=0.01, beta=1, alpha_w=2668, alpha_O=2.1, alpha_p=0
+    mu=mu, beta=1, alpha_w=2668, alpha_O=2.1, alpha_p=0
 )
 
 # Button to run the simulation
