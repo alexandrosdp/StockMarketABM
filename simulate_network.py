@@ -108,35 +108,13 @@ if __name__ == '__main__':
 
     prices = market.prices
 
-    # store the profits of the agents
-    profit_dict = {}
-    for agent in market.network.trader_dictionary.values():
-        profit_dict[agent.node_number] = agent.G
-
-    wealth_dict = {}
-    for agent in market.network.trader_dictionary.values():
-        wealth_dict[agent.node_number] = agent.W
-    
-    demand_dict = {}
-    for agent in market.network.trader_dictionary.values():
-        demand_dict[agent.node_number] = agent.D
-
-    # plot the wealth of the agents
-    plt.figure()
-    for agent in market.network.trader_dictionary.values():
-        plt.plot(agent.W)
-    plt.xlabel('Time')
-    plt.ylabel('Wealth')
-    plt.title('Discrete Choice Approach: Wealth')
-    plt.show()
-
     rr = np.array(prices[1:T+1]) - np.array(prices[0:T])
 
     plt.figure()
     plt.plot(np.exp(prices))
     plt.xlabel('Time')
     plt.ylabel('Price')
-    plt.title('Discrete Choice Approach: Wealth')
+    plt.title('Price of the asset over time')
     plt.show()
 
     # plot returns
@@ -152,12 +130,9 @@ if __name__ == '__main__':
     xmin, xmax = plt.xlim()
     x = np.linspace(xmin, xmax, 100)
     p = norm.pdf(x, mu, std)
-    
-    
-    
-
     # Plot normal distribution curve
     plt.plot(x, p, 'k', linewidth=2)
+    plt.title('Histogram of returns')
     plt.show()
     
     sm.qqplot(rr.flatten(), line='s')  # 's' line fit standardizes the data to have the same scale
@@ -167,4 +142,23 @@ if __name__ == '__main__':
     # Calculate kurtosis (K value)
     kurtosis_value = kurtosis(rr.flatten())
     print(f"Sample kurtosis (K value): {kurtosis_value}")
+
+    # volatility clustering
+    # set figure size
+    plt.figure(figsize=(12, 5))
+    squared_returns = rr.flatten()**2
+    plt.plot(squared_returns)
+    plt.xlabel('Time')
+    plt.ylabel('Squared Returns')
+    plt.title('Squared Returns over time')
+    plt.show()
+
+    # ACF plot
+    fig, ax = plt.subplots(2, 1, figsize=(12, 8))
+    plot_acf(np.abs(rr.flatten()), ax=ax[0])
+    ax[0].set_title('ACF of Absolute Returns')
+    plot_acf(rr.flatten()**2, ax=ax[1])
+    ax[1].set_title('ACF of Squared Returns')
+    plt.tight_layout()
+    plt.show()
 
