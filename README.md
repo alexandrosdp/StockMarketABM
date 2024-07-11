@@ -13,6 +13,7 @@ This repository contains a stock price simulation model using agent-based modeli
 - `requirements.txt`: Lists the required Python packages.
 - `streamlit_app.py`: Streamlit application for interactive simulations.
 
+
 ## Installation
 
 1. Clone the repository:
