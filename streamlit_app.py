@@ -15,7 +15,7 @@ Adjust the parameters and run the simulation to see the results.
 st.sidebar.header('Simulation Parameters')
 initial_price = st.sidebar.number_input('Initial Price', min_value=0.0, value=0.0)
 time_steps = st.sidebar.number_input('Time Steps', min_value=1, max_value=1000, value=500)
-network_type = st.sidebar.selectbox('Network Type', ['small_world', 'barabasi'])
+network_type = st.sidebar.selectbox('Network Type', ['barabasi', 'small_world'])
 number_of_traders = st.sidebar.number_input('Number of Traders', min_value=1, max_value=500, value=150)
 percent_fund = st.sidebar.slider('Percent Fundamental Traders', min_value=0.0, max_value=1.0, value=0.5)
 percent_chartist = st.sidebar.slider('Percent Chartist Traders', min_value=0.0, max_value=1.0, value=0.5)
@@ -25,7 +25,7 @@ high_lookback = st.sidebar.number_input('High Lookback Period', min_value=1, max
 low_lookback = st.sidebar.number_input('Low Lookback Period', min_value=1, max_value=100, value=1)
 high_risk = st.sidebar.slider('High Risk', min_value=0.0, max_value=1.0, value=0.5)
 low_risk = st.sidebar.slider('Low Risk', min_value=0.0, max_value=1.0, value=0.1)
-new_node_edges = st.sidebar.number_input('New Node Edges', min_value=1, max_value=100, value=5)
+new_node_edges = st.sidebar.number_input('New Node Edges', min_value=1, max_value=100, value=8)
 connection_probability = st.sidebar.slider('Connection Probability', min_value=0.0, max_value=1.0, value=0.5)
 mu = st.sidebar.number_input('Mu', min_value=0.0, value=0.01)
 

@@ -130,9 +130,8 @@ class Experiment():
         if plot:
             plt.figure()
             plt.plot(returns**2)
-            plt.title('Autocorrelation of Returns')
-            plt.xlabel('Lags')
-            plt.ylabel('Autocorrelation')
+            plt.xlabel('Time')
+            plt.ylabel('Squared Returns')
             st.pyplot(plt.gcf())
         if arch_test[1] < 0.05:
             return 1, arch_test[1]
