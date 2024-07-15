@@ -7,8 +7,16 @@ from tqdm import tqdm
 from scipy.stats import kstwobign
 from Experiment import *
 
-# Define the model function
 def model(params_chunk):
+    """
+    Model function to run simulations for a chunk of parameters.
+
+    Parameters:
+    params_chunk (array): Array of parameter sets.
+
+    Returns:
+    list: List of results for each parameter set.
+    """
     results = []
     for params in params_chunk:
         number_of_traders = int(params[0])
@@ -64,8 +72,17 @@ problem = {
 N = 1000
 param_values = latin.sample(problem, N)
 
-# Parallel model evaluation with progress tracking
 def parallel_model_evaluation(param_values, num_workers=8):
+    """
+    Evaluate the model in parallel.
+
+    Parameters:
+    param_values (array): Array of parameter sets.
+    num_workers (int): Number of parallel workers.
+
+    Returns:
+    array: Concatenated results from all workers.
+    """
     chunks = np.array_split(param_values, num_workers)
     with mp.Pool(num_workers) as pool:
         results = list(tqdm(pool.imap(model, chunks), total=num_workers))
@@ -98,16 +115,10 @@ if __name__ == '__main__':
 
     # Rank Factors
     factors = problem['names']
-    # Sort factors by mean sensitivity indices
-    #sorted_mean_ranking = sorted(zip(factors, pawn_Si_mean), key=lambda x: x[1], reverse=True)
     sorted_max_ranking = sorted(zip(factors, pawn_Si_max), key=lambda x: x[1], reverse=True)
 
     # Unzip the sorted rankings
-    #sorted_factors_mean, sorted_pawn_Si_mean = zip(*sorted_mean_ranking)
     sorted_factors_max, sorted_pawn_Si_max = zip(*sorted_max_ranking)
-
-    # Plot results
-    
 
     # Plot maximum sensitivity indices
     plt.figure(figsize=(12, 8))
@@ -119,9 +130,6 @@ if __name__ == '__main__':
     plt.savefig('pawn_SA_K_extended.png')
     plt.show()
     
-    #plt.figure(figsize=(12, 8))
-    #plt.scatter( , pawn_Si_max, color='skyblue', edgecolor='black')
-
     # Display significance
     print("Significance Results:")
     for name in factors:

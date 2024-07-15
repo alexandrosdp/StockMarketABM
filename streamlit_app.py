@@ -1,9 +1,7 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-import statsmodels.api as sm
 from Experiment import Experiment
-import numpy as np
 
 # Set up the Streamlit interface
 st.title('Stock Price Simulation Experiment')
@@ -15,7 +13,7 @@ Adjust the parameters and run the simulation to see the results.
 
 # Sidebar for user inputs
 st.sidebar.header('Simulation Parameters')
-initial_price = st.sidebar.number_input('Initial Price', min_value=0.0, value=100.0)
+initial_price = st.sidebar.number_input('Initial Price', min_value=0.0, value=0.0)
 time_steps = st.sidebar.number_input('Time Steps', min_value=1, max_value=1000, value=500)
 network_type = st.sidebar.selectbox('Network Type', ['small_world', 'barabasi'])
 number_of_traders = st.sidebar.number_input('Number of Traders', min_value=1, max_value=500, value=150)
@@ -30,8 +28,6 @@ low_risk = st.sidebar.slider('Low Risk', min_value=0.0, max_value=1.0, value=0.1
 new_node_edges = st.sidebar.number_input('New Node Edges', min_value=1, max_value=100, value=5)
 connection_probability = st.sidebar.slider('Connection Probability', min_value=0.0, max_value=1.0, value=0.5)
 mu = st.sidebar.number_input('Mu', min_value=0.0, value=0.01)
-
-
 
 # Create an instance of the Experiment class with user inputs
 experiment = Experiment(
@@ -62,7 +58,6 @@ if st.sidebar.button('Run Simulation'):
     st.subheader('Simulated Stock Prices')
     st.line_chart(df.set_index('Day'))
 
-    
     # Fat Tail Experiment
     st.subheader('Fat Tail Experiment')
     kurtosis_value = experiment.fat_tail_experiment(time_steps, prices, True)
@@ -82,8 +77,6 @@ if st.sidebar.button('Run Simulation'):
     crash, drop_magnitude = experiment.crash_experiment()
     st.write(f"Number of Crashes Detected: {crash}")
     st.write(f"Drop Magnitude: {drop_magnitude}")
-
-    
 
 # Instructions
 st.write("""
